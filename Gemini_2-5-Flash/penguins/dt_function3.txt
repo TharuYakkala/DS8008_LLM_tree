@@ -1,0 +1,37 @@
+```python
+def classify_penguin(island, culmen_length_mm, culmen_depth_mm, flipper_length_mm, body_mass_g, sex):
+    """
+    Classifies the species of a penguin (Adelie / Chinstrap / Gentoo) based on its features.
+
+    Args:
+        island (str): The island where the penguin was observed (Biscoe / Dream / Torgersen).
+        culmen_length_mm (float): Culmen (bill) length in millimeters.
+        culmen_depth_mm (float): Culmen (bill) depth in millimeters.
+        flipper_length_mm (float): Flipper length in millimeters.
+        body_mass_g (float): Body mass in grams.
+        sex (str): Sex of the penguin (male / female).
+
+    Returns:
+        tuple: A tuple containing the predicted species (str) and a list of inner node
+               truth values (list of int, where 1 means condition met, 0 otherwise).
+    """
+    inner_node_truth_values = []
+
+    # Node 1 (Root): Separate Gentoo based on flipper length
+    # Gentoo penguins are significantly larger with longer flippers.
+    if flipper_length_mm > 205.0:
+        inner_node_truth_values.append(1)
+        prediction = "Gentoo"
+    else:
+        inner_node_truth_values.append(0)
+        # Node 2: Separate Adelie and Chinstrap based on culmen length
+        # Chinstrap penguins typically have longer culmens than Adelie penguins.
+        if culmen_length_mm > 45.0:
+            inner_node_truth_values.append(1)
+            prediction = "Chinstrap"
+        else:
+            inner_node_truth_values.append(0)
+            prediction = "Adelie"
+
+    return prediction, inner_node_truth_values
+```

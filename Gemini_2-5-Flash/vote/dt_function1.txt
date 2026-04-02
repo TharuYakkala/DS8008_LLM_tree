@@ -1,0 +1,51 @@
+```python
+def classify_party_affiliation(
+    vote_handicapped_infants,
+    vote_water_project_cost_sharing,
+    vote_budget_resolution,
+    vote_physician_fee_freeze,
+    vote_aid_el_salvador,
+    vote_religious_groups_in_schools,
+    vote_anti_satellite_test_ban,
+    vote_aid_nicaraguan_contras,
+    vote_mx_missile,
+    vote_immigration,
+    vote_synfuels_corporation_cutback,
+    vote_education_spending,
+    vote_superfund_right_to_sue,
+    vote_crime,
+    vote_duty_free_exports,
+    vote_export_admin_act_south_africa
+):
+    node_truth_values = []
+
+    # Root Node: Vote on aid to Nicaraguan contras (yes / no)
+    # This issue was a highly significant and divisive foreign policy debate during the 1980s.
+    # Republicans generally supported aid to the Contras, while Democrats largely opposed it.
+    if vote_aid_nicaraguan_contras == "yes":
+        node_truth_values.append(1)  # Condition satisfied: Voted 'yes' on Contra aid
+        
+        # Inner Node (depth 1, 'yes' branch): Vote on allowing religious groups in schools (yes / no)
+        # This is a key social issue, with Republicans generally favoring religious presence in public life.
+        if vote_religious_groups_in_schools == "yes":
+            node_truth_values.append(1)  # Condition satisfied: Voted 'yes' on religious groups in schools
+            return ("Republican", node_truth_values)
+        else:
+            node_truth_values.append(0)  # Condition not satisfied: Voted 'no' on religious groups in schools
+            # While this might indicate a more moderate stance, the strong initial vote on Contra aid
+            # makes 'Republican' the most likely affiliation within this limited depth.
+            return ("Republican", node_truth_values)
+    else:  # vote_aid_nicaraguan_contras == "no"
+        node_truth_values.append(0)  # Condition not satisfied: Voted 'no' on Contra aid
+
+        # Inner Node (depth 1, 'no' branch): Vote on education spending (yes / no)
+        # Education spending is a core domestic policy issue where Democrats often advocate for more federal investment.
+        if vote_education_spending == "yes":
+            node_truth_values.append(1)  # Condition satisfied: Voted 'yes' on education spending
+            return ("Democrat", node_truth_values)
+        else:
+            node_truth_values.append(0)  # Condition not satisfied: Voted 'no' on education spending
+            # Similar to the 'Republican' branch, even a 'no' vote here, when combined with opposition to Contra aid,
+            # still strongly points to 'Democrat' as the dominant class for this path at depth 2.
+            return ("Democrat", node_truth_values)
+```

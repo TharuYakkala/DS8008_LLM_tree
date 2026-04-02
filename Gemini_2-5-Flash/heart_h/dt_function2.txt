@@ -1,0 +1,50 @@
+```python
+def predict_heart_disease(age, sex, chest_pain_type, resting_blood_pressure, serum_cholesterol, fasting_blood_sugar, resting_ecg_results, maximum_heart_rate_achieved, exercise_induced_angina, st_depression_induced_by_exercise_relative_to_rest, slope_of_the_peak_exercise_st_segment, number_of_major_vessels_colored_by_fluoroscopy, thalassemia):
+    """
+    Predicts whether a patient has heart disease based on various medical features.
+
+    Parameters:
+    - age (years): Patient's age.
+    - sex (male / female): Patient's biological sex.
+    - chest_pain_type (Typical angina / Atypical angina / Non-anginal pain / Asymptomatic): Type of chest pain experienced.
+    - resting_blood_pressure (mmHg): Resting blood pressure.
+    - serum_cholesterol (mg/dl): Serum cholesterol level.
+    - fasting_blood_sugar (true / false): Fasting blood sugar level indicating diabetes if true (>120 mg/dl).
+    - resting_ecg_results (Normal / Having ST-T wave abnormality / Showing probable or definite left ventricular hypertrophy by Estes' criteria): Resting electrocardiographic results.
+    - maximum_heart_rate_achieved (bpm): Maximum heart rate achieved during exercise.
+    - exercise_induced_angina (yes / no): Whether exercise induced angina.
+    - st_depression_induced_by_exercise_relative_to_rest (0 to 5): ST depression induced by exercise relative to rest.
+    - slope_of_the_peak_exercise_st_segment (Upsloping / Flat / Downsloping): Slope of the peak exercise ST segment.
+    - number_of_major_vessels_colored_by_fluoroscopy (0 / 1 / 2 / 3): Number of major vessels colored by fluoroscopy.
+    - thalassemia (Normal / Fixed defect / Reversible defect): Thalassemia status.
+
+    Returns:
+    - prediction (int): 1 if heart disease is predicted, 0 otherwise.
+    - inner_node_truth_values (list): A list where each element is 1 if the condition of the corresponding
+                                       inner node was satisfied, and 0 otherwise, following the path taken.
+    """
+    inner_node_truth_values = []
+    prediction = -1  # Initialize prediction
+
+    # Root Node: Is the patient experiencing Typical Angina? This is a strong indicator.
+    if chest_pain_type == 'Typical angina':
+        inner_node_truth_values.append(1)
+        # If typical angina is present, it's a strong indicator of heart disease.
+        prediction = 1
+    else:
+        inner_node_truth_values.append(0)
+        # If not typical angina, check for objective signs from exercise stress test.
+        # Child Node: Is there significant ST depression induced by exercise?
+        # A value greater than 1.0 mm is generally considered significant.
+        if st_depression_induced_by_exercise_relative_to_rest > 1.0:
+            inner_node_truth_values.append(1)
+            # Significant ST depression during exercise is a strong sign of ischemia.
+            prediction = 1
+        else:
+            inner_node_truth_values.append(0)
+            # Without typical angina and without significant ST depression,
+            # the likelihood of heart disease is lower based on these features.
+            prediction = 0
+
+    return prediction, inner_node_truth_values
+```

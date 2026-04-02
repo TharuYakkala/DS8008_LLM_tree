@@ -1,0 +1,74 @@
+```python
+def classify_pain_disability(
+    age_years,
+    body_mass_index_kg_m_2,
+    gender_at_birth,
+    ethnicity,
+    education_age,
+    work_status,
+    smoke_status,
+    hospital_stay_days,
+    injury_severity_score_total,
+    injury_severity_score_category,
+    number_of_fractures,
+    penetrating_injury,
+    EQ_5D_5L,
+    EQ_5D_VAS,
+    SF36v2_mental,
+    SF36v2_physical,
+    HADS_anxiety,
+    HADS_depression,
+    TSK_11_total,
+    PSEQ_total,
+    IES_R_total,
+    IES_R_avoidance,
+    IES_R_hyperarousal,
+    IES_R_intrusion,
+    pain_intensity_average,
+    pain_intensity_current,
+    pain_intensity_worst,
+    pain_intensity_least,
+    pain_region_count,
+    pain_extent_percent,
+    painDETECT_total,
+    sleep_quality_last_24_hours,
+    sleep_quality_since_injury,
+    local_heat_pain_threshold,
+    remote_heat_pain_threshold,
+    local_cold_pain_threshold,
+    remote_cold_pain_threshold,
+    local_pressure_pain_threshold_kPa,
+    remote_pressure_pain_threshold_kPa,
+    C_reactive_protein_mg_L
+):
+    inner_node_truth_values = []
+    prediction = None
+
+    # Root Node (Depth 0): 'TSK-11 total' (Tampa Scale for Kinesiophobia)
+    # A score > 22 indicates clinically relevant kinesiophobia, a strong predictor of poor outcomes.
+    if TSK_11_total <= 22:
+        inner_node_truth_values.append(1) # Condition 'TSK-11 total <= 22' is satisfied
+        # Branch for lower kinesiophobia (potentially good outcome)
+        # Child Node (Depth 1): 'painDETECT total'
+        # painDETECT total > 12-19 suggests a neuropathic pain component, which can worsen prognosis.
+        if painDETECT_total <= 12:
+            inner_node_truth_values.append(1) # Condition 'painDETECT total <= 12' is satisfied
+            prediction = 'good'
+        else:
+            inner_node_truth_values.append(0) # Condition 'painDETECT total <= 12' is NOT satisfied
+            prediction = 'bad'
+    else:
+        inner_node_truth_values.append(0) # Condition 'TSK-11 total <= 22' is NOT satisfied (TSK-11 total > 22)
+        # Branch for higher kinesiophobia (potentially bad outcome)
+        # Child Node (Depth 1): 'HADS depression' (Hospital Anxiety and Depression Scale - Depression)
+        # A score > 7 indicates clinical depression, which further exacerbates pain and disability.
+        # High kinesiophobia is a strong enough predictor for 'bad' even without severe depression.
+        if HADS_depression <= 7:
+            inner_node_truth_values.append(1) # Condition 'HADS depression <= 7' is satisfied
+            prediction = 'bad' 
+        else:
+            inner_node_truth_values.append(0) # Condition 'HADS depression <= 7' is NOT satisfied
+            prediction = 'bad' 
+
+    return prediction, inner_node_truth_values
+```

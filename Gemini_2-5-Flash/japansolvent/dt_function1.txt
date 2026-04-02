@@ -1,0 +1,63 @@
+```python
+def classify_solvency(
+    EBIT_Total_Assets: float,
+    Net_Income_Total_Capital: float,
+    Sales_Total_Assets: float,
+    EBIT_Sales: float,
+    Net_Income_Sales: float,
+    Working_Capital_Total_Assets: float,
+    Equity_Total_Liabilities: float,
+    Equity_Total_Assets: float
+) -> tuple[str, list[int]]:
+    """
+    Classifies a company as 'Solvent' or 'Insolvent' based on key financial ratios.
+
+    The decision tree has a maximum depth of 2.
+
+    Args:
+        EBIT_Total_Assets (float): Earnings Before Interest and Taxes / Total Assets
+        Net_Income_Total_Capital (float): Net Income / Total Capital
+        Sales_Total_Assets (float): Sales / Total Assets
+        EBIT_Sales (float): Earnings Before Interest and Taxes / Sales
+        Net_Income_Sales (float): Net Income / Sales
+        Working_Capital_Total_Assets (float): Working Capital / Total Assets
+        Equity_Total_Liabilities (float): Equity / Total Liabilities
+        Equity_Total_Assets (float): Equity / Total Assets
+
+    Returns:
+        tuple[str, list[int]]: A tuple containing:
+            - The predicted classification ('Solvent' or 'Insolvent').
+            - A list representing the truth values of the inner nodes encountered
+              during the decision path. 1 if the condition was satisfied, 0 otherwise.
+    """
+    inner_nodes_truth = []
+    prediction = ""
+
+    # Root Node 0: Check for operational profitability
+    # Condition: EBIT/Total Assets > 0.0 (Is the company profitable on its assets?)
+    if EBIT_Total_Assets > 0.0:
+        inner_nodes_truth.append(1)  # Condition 1 satisfied
+        # Node 1 (Right Child - Profitable path): Check long-term leverage
+        # Condition: Equity/Total Liabilities > 0.2 (Does equity provide a reasonable cushion against liabilities?)
+        if Equity_Total_Liabilities > 0.2:
+            inner_nodes_truth.append(1)  # Condition 2 satisfied
+            prediction = "Solvent"
+        else:
+            inner_nodes_truth.append(0)  # Condition 2 not satisfied
+            # Even if profitable, extremely high leverage (Equity < 20% of Liabilities) makes the company highly vulnerable.
+            prediction = "Insolvent"
+    else:
+        inner_nodes_truth.append(0)  # Condition 1 not satisfied
+        # Node 2 (Left Child - Unprofitable path): Check short-term liquidity
+        # Condition: Working Capital/Total Assets > 0.0 (Can the company cover its short-term obligations?)
+        if Working_Capital_Total_Assets > 0.0:
+            inner_nodes_truth.append(1)  # Condition 3 satisfied
+            # Unprofitable, but still has positive working capital, indicating some resilience to meet current obligations.
+            prediction = "Solvent"
+        else:
+            inner_nodes_truth.append(0)  # Condition 3 not satisfied
+            # Unprofitable AND cannot cover short-term obligations, a critical state.
+            prediction = "Insolvent"
+
+    return prediction, inner_nodes_truth
+```

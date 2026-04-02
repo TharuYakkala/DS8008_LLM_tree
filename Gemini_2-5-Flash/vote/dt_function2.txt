@@ -1,0 +1,33 @@
+```python
+def classify_party(features):
+    inner_node_truth_values = []
+
+    # Root Node: Vote on aid to Nicaraguan contras
+    # This issue was highly partisan, with Democrats largely opposing aid and Republicans supporting it.
+    if features['Vote on aid to Nicaraguan contras'] == 'no':
+        inner_node_truth_values.append(1)  # Condition 1: 'Vote on aid to Nicaraguan contras' == 'no' is satisfied (Likely Democrat path)
+
+        # Left Branch (Predominantly Democrat)
+        # Sub-split: Vote on education spending
+        # Democrats generally favor more government spending on education.
+        if features['Vote on education spending'] == 'yes':
+            inner_node_truth_values.append(1)  # Condition 2 (left branch): 'Vote on education spending' == 'yes' is satisfied
+            return 'Democrat', inner_node_truth_values
+        else:  # Vote on education spending == 'no'
+            inner_node_truth_values.append(0)  # Condition 2 (left branch): 'Vote on education spending' == 'yes' is NOT satisfied
+            # Even if 'no' on education spending, the 'no' vote on Contra aid is a strong Democrat indicator
+            return 'Democrat', inner_node_truth_values
+    else:  # Vote on aid to Nicaraguan contras == 'yes'
+        inner_node_truth_values.append(0)  # Condition 1: 'Vote on aid to Nicaraguan contras' == 'no' is NOT satisfied (Likely Republican path)
+
+        # Right Branch (Predominantly Republican)
+        # Sub-split: Vote on physician fee freeze
+        # Republicans generally favored fiscal conservatism, which often included freezes or cuts in spending.
+        if features['Vote on physician fee freeze'] == 'yes':
+            inner_node_truth_values.append(1)  # Condition 2 (right branch): 'Vote on physician fee freeze' == 'yes' is satisfied
+            return 'Republican', inner_node_truth_values
+        else:  # Vote on physician fee freeze == 'no'
+            inner_node_truth_values.append(0)  # Condition 2 (right branch): 'Vote on physician fee freeze' == 'yes' is NOT satisfied
+            # Even if 'no' on physician fee freeze, the 'yes' vote on Contra aid is a strong Republican indicator
+            return 'Republican', inner_node_truth_values
+```

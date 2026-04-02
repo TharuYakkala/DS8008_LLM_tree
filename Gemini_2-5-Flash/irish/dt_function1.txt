@@ -1,0 +1,42 @@
+```python
+def predict_school_leaving_certificate(sex, drumcondra_score, educational_level, father_prestige, school_type):
+    """
+    Predicts whether a school leaving certificate is taken based on given features.
+    The tree has a maximum depth of 2.
+
+    Args:
+        sex (str): 'male' or 'female'.
+        drumcondra_score (int): Drumcondra Verbal Reasoning Test Score.
+        educational_level (int): Educational level attained (0 to 10).
+        father_prestige (int): Prestige score for father's occupation (0 to 28).
+        school_type (str): Type of school ('secondary', 'vocational', 'primary terminal leaver').
+
+    Returns:
+        tuple: (prediction, inner_node_truth_values)
+               prediction (int): 1 if certificate is taken, 0 otherwise.
+               inner_node_truth_values (list): List of 0s and 1s representing
+                                               truth values of inner node conditions.
+                                               The order corresponds to the evaluation path.
+    """
+    inner_node_truth_values = []
+
+    # Root Node 1: Is the student a 'primary terminal leaver'?
+    # This is a strong indicator that they will not pursue a general school leaving certificate.
+    if school_type == 'primary terminal leaver':
+        inner_node_truth_values.append(1)  # Condition 'school_type == "primary terminal leaver"' is TRUE
+        return 0, inner_node_truth_values  # Prediction: Not taken (0)
+    else:
+        inner_node_truth_values.append(0)  # Condition 'school_type == "primary terminal leaver"' is FALSE
+        
+        # Inner Node 2 (executed if not 'primary terminal leaver'):
+        # For students in secondary or vocational schools, their educational level attained
+        # is a key predictor of their likelihood to complete the certificate.
+        # Assuming educational level 0-10, a level >= 7 suggests being on track for completion.
+        if educational_level >= 7:
+            inner_node_truth_values.append(1)  # Condition 'educational_level >= 7' is TRUE
+            return 1, inner_node_truth_values  # Prediction: Taken (1)
+        else:
+            inner_node_truth_values.append(0)  # Condition 'educational_level >= 7' is FALSE
+            return 0, inner_node_truth_values  # Prediction: Not taken (0)
+
+```

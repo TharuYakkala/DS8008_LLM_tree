@@ -1,0 +1,55 @@
+```python
+def classify_heart_disease(
+    age, sex, chest_pain_type, resting_blood_pressure, serum_cholesterol,
+    fasting_blood_sugar, resting_ecg_results, maximum_heart_rate_achieved,
+    exercise_induced_angina, st_depression_exercise_rest,
+    slope_peak_exercise_st_segment, number_of_major_vessels, thalassemia
+):
+    """
+    Classifies whether a patient has heart disease based on medical features.
+
+    Args:
+        age (int): Age of the patient in years.
+        sex (str): 'male' or 'female'.
+        chest_pain_type (str): 'Typical angina', 'Atypical angina', 'Non-anginal pain', 'Asymptomatic'.
+        resting_blood_pressure (int): Resting blood pressure in mmHg.
+        serum_cholesterol (int): Serum cholesterol in mg/dl.
+        fasting_blood_sugar (bool): True if fasting blood sugar > 120 mg/dl, False otherwise.
+        resting_ecg_results (str): 'Normal', 'Having ST-T wave abnormality', 'Showing probable or definite left ventricular hypertrophy by Estes' criteria'.
+        maximum_heart_rate_achieved (int): Maximum heart rate achieved during exercise in bpm.
+        exercise_induced_angina (str): 'yes' or 'no'.
+        st_depression_exercise_rest (float): ST depression induced by exercise relative to rest (0 to 5).
+        slope_peak_exercise_st_segment (str): 'Upsloping', 'Flat', 'Downsloping'.
+        number_of_major_vessels (int): Number of major vessels (0 / 1 / 2 / 3) colored by fluoroscopy.
+        thalassemia (str): 'Normal', 'Fixed defect', 'Reversible defect'.
+
+    Returns:
+        tuple: A tuple containing:
+            - str: The predicted class ('Heart Disease' or 'No Heart Disease').
+            - list: A list representing the truth values of the inner nodes.
+                    1 if the condition of the corresponding inner node is satisfied, 0 otherwise.
+    """
+    node_truth_values = []
+
+    # Node 1 (Root Node, Depth 0): Primary check for anatomical coronary artery disease
+    # This node uses 'Number of Major Vessels Colored by Fluoroscopy' as it's a direct indicator of blockages.
+    # Condition: number_of_major_vessels > 0 (i.e., 1, 2, or 3 vessels affected)
+    if number_of_major_vessels > 0:
+        node_truth_values.append(1)  # Condition of Node 1 satisfied
+        # If major vessels are affected, highly likely to be Heart Disease. This is a leaf at depth 1.
+        return "Heart Disease", node_truth_values
+    else:
+        node_truth_values.append(0)  # Condition of Node 1 not satisfied (number_of_major_vessels is 0)
+
+        # Node 2 (Child Node, Depth 1): Secondary check for functional ischemia when no major blockages are found.
+        # This node uses 'Thalassemia' which often refers to perfusion defects found in stress tests.
+        # Condition: thalassemia is 'Fixed defect' or 'Reversible defect' (indicating myocardial ischemia or infarct)
+        if thalassemia in ['Fixed defect', 'Reversible defect']:
+            node_truth_values.append(1)  # Condition of Node 2 satisfied
+            # If perfusion defects are present, it indicates Heart Disease. This is a leaf at depth 2.
+            return "Heart Disease", node_truth_values
+        else:
+            node_truth_values.append(0)  # Condition of Node 2 not satisfied (thalassemia is 'Normal')
+            # If no major blockages and no perfusion defects, predict No Heart Disease. This is a leaf at depth 2.
+            return "No Heart Disease", node_truth_values
+```

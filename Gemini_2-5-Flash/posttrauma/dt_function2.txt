@@ -1,0 +1,62 @@
+```python
+def predict_pain_disability_outcome(
+    age_years, body_mass_index_kg_m2, gender_at_birth, ethnicity, education_age,
+    work_status, smoke_status, hospital_stay_days, injury_severity_score_total,
+    injury_severity_score_category, number_of_fractures, penetrating_injury,
+    eq_5d_5l, eq_5d_vas, sf36v2_mental, sf36v2_physical, hads_anxiety, hads_depression,
+    tsk_11_total, pseq_total, ies_r_total, ies_r_avoidance, ies_r_hyperarousal,
+    ies_r_intrusion, pain_intensity_average, pain_intensity_current, pain_intensity_worst,
+    pain_intensity_least, pain_region_count, pain_extent_percent, pain_detect_total,
+    sleep_quality_last_24_hours, sleep_quality_since_injury, local_heat_pain_threshold,
+    remote_heat_pain_threshold, local_cold_pain_threshold, remote_cold_pain_threshold,
+    local_pressure_pain_threshold_kpa, remote_pressure_pain_threshold_kpa,
+    c_reactive_protein_mg_l
+):
+    """
+    Predicts the pain and disability outcome (good/bad) at 6 months following musculoskeletal trauma.
+
+    This decision tree is induced based on domain expertise without real-world data,
+    using selected features with a maximum depth of 2.
+
+    Args:
+        All features listed in the problem description, converted to snake_case.
+        Relevant features for this tree are:
+        - injury_severity_score_total (numerical)
+        - tsk_11_total (numerical, Tampa Scale of Kinesiophobia total score)
+        - pseq_total (numerical, Pain Self-Efficacy Questionnaire total score)
+
+    Returns:
+        tuple: A tuple containing:
+            - str: The predicted outcome ("good" or "bad").
+            - list: A list of integers (1 or 0) representing the truth values
+                    of the conditions encountered at each inner node along the
+                    decision path. 1 if the condition is satisfied, 0 otherwise.
+    """
+    inner_node_truth_values = []
+    prediction = "undefined"
+
+    # Node 1: Root split on Injury Severity Score Total
+    # A total ISS score of 15 or less typically indicates mild to moderate injury.
+    if injury_severity_score_total <= 15:
+        inner_node_truth_values.append(1) # Condition 1 (injury_severity_score_total <= 15) is True
+        # Node 2a: Split for mild/moderate injury path, using TSK-11 Total
+        # A TSK-11 score of 25 or less often indicates lower kinesiophobia, promoting better recovery.
+        if tsk_11_total <= 25:
+            inner_node_truth_values.append(1) # Condition 2a (tsk_11_total <= 25) is True
+            prediction = "good"
+        else:
+            inner_node_truth_values.append(0) # Condition 2a (tsk_11_total <= 25) is False (higher kinesiophobia)
+            prediction = "bad"
+    else:
+        inner_node_truth_values.append(0) # Condition 1 (injury_severity_score_total <= 15) is False (major injury)
+        # Node 2b: Split for major injury path, using PSEQ Total
+        # A PSEQ score of 40 or higher indicates strong pain self-efficacy, which can mitigate the impact of severe injury.
+        if pseq_total >= 40:
+            inner_node_truth_values.append(1) # Condition 2b (pseq_total >= 40) is True
+            prediction = "good"
+        else:
+            inner_node_truth_values.append(0) # Condition 2b (pseq_total >= 40) is False (lower self-efficacy)
+            prediction = "bad"
+
+    return prediction, inner_node_truth_values
+```

@@ -1,0 +1,106 @@
+```python
+def predict_cartilage_thickness_change(
+    group,
+    sex,
+    height_cm,
+    body_mass_kg,
+    body_mass_index_kg_m2,
+    age_years,
+    Lysholm_score,
+    IKDC_score,
+    Tegner_score,
+    baseline_mean_cartilage_thickness_in_the_central_medial_femur_mm,
+    baseline_mean_T2_values_for_the_deep_cartilage_layers_in_the_central_medial_femur_ms,
+    baseline_mean_T2_values_for_the_superficial_cartilage_layers_in_the_central_medial_femur_ms,
+    external_peak_knee_moment_around_x_axis_nm,
+    external_peak_knee_moment_around_y_axis_nm,
+    external_peak_knee_moment_around_z_axis_nm,
+    dominant_leg,
+    days_from_injury_to_baseline_MRI
+):
+    """
+    Predicts whether the cartilage thickness change in the central medial femur
+    over 12 months following anterior cruciate ligament injury is normal or abnormal.
+
+    This decision tree is induced based on expert knowledge and prioritizes key clinical
+    and biomechanical factors known to influence cartilage health post-ACL injury,
+    with a maximum depth of 2.
+
+    Parameters:
+        group (str): Patient's classification ('coper', 'noncoper', 'surgical reconstruction').
+        sex (str): Patient's sex ('female', 'male').
+        height_cm (float): Patient's height in centimeters.
+        body_mass_kg (float): Patient's body mass in kilograms.
+        body_mass_index_kg_m2 (float): Patient's Body Mass Index in kg/m^2.
+        age_years (int): Patient's age in years.
+        Lysholm_score (int): Lysholm knee score.
+        IKDC_score (int): International Knee Documentation Committee (IKDC) score.
+        Tegner_score (int): Tegner activity score.
+        baseline_mean_cartilage_thickness_in_the_central_medial_femur_mm (float): Baseline mean cartilage thickness (mm).
+        baseline_mean_T2_values_for_the_deep_cartilage_layers_in_the_central_medial_femur_ms (float): Baseline mean T2 values for deep cartilage layers (ms).
+        baseline_mean_T2_values_for_the_superficial_cartilage_layers_in_the_central_medial_femur_ms (float): Baseline mean T2 values for superficial cartilage layers (ms).
+        external_peak_knee_moment_around_x_axis_nm (float): External peak knee moment around x-axis (Nm).
+        external_peak_knee_moment_around_y_axis_nm (float): External peak knee moment around y-axis (Nm).
+        external_peak_knee_moment_around_z_axis_nm (float): External peak knee moment around z-axis (Nm).
+        dominant_leg (str): Dominant leg ('left', 'right').
+        days_from_injury_to_baseline_MRI (int): Days from injury to baseline MRI.
+
+    Returns:
+        tuple: A tuple containing the prediction ('normal' or 'abnormal')
+               and a list representing the truth values of the inner nodes traversed.
+               Each entry in the list is 1 if the node's condition is satisfied, 0 otherwise.
+    """
+    truth_values = []
+    
+    # Aliases for frequently used features to improve readability
+    _group = group
+    _body_mass_index = body_mass_index_kg_m2
+    _t2_deep_cmf = baseline_mean_T2_values_for_the_deep_cartilage_layers_in_the_central_medial_femur_ms
+
+    # Root Node (Depth 0): Is the patient classified as a 'noncoper'?
+    # Non-copers typically experience persistent knee instability, which is a major risk
+    # factor for accelerated cartilage degeneration post-ACL injury.
+    node_0_condition_satisfied = (_group == 'noncoper')
+    truth_values.append(1 if node_0_condition_satisfied else 0)
+
+    if node_0_condition_satisfied:
+        # Branch for 'noncoper' group: These patients are at a higher baseline risk.
+        # Secondary Node (Depth 1, first potential path): Check baseline deep cartilage T2 values.
+        # Elevated T2 relaxation times in deep cartilage layers are indicative of early
+        # biochemical changes, such as increased water content or collagen disorganization,
+        # preceding structural cartilage loss. A threshold of >45ms is often associated
+        # with signs of degradation.
+        node_1_condition_satisfied = (_t2_deep_cmf > 45.0) # Threshold for T2 values (ms)
+        truth_values.append(1 if node_1_condition_satisfied else 0)
+
+        if node_1_condition_satisfied:
+            # If a patient is a noncoper AND shows signs of early deep cartilage degradation
+            # (elevated T2), the prognosis for 12-month change is 'abnormal'.
+            prediction = 'abnormal'
+        else:
+            # If a patient is a noncoper but their baseline deep cartilage T2 values are
+            # within a relatively normal range, indicating less immediate biochemical
+            # degradation. While still at risk, we classify as 'normal' in this depth-2 tree.
+            prediction = 'normal'
+    else:
+        # Branch for 'coper' or 'surgical reconstruction' groups: Generally lower baseline risk.
+        # Secondary Node (Depth 1, second potential path): Check Body Mass Index (BMI).
+        # High BMI significantly increases mechanical load on the knee joint, which is a
+        # well-established risk factor for osteoarthritis progression and cartilage
+        # degradation, even in adequately managed ACL injury cases. A BMI > 28 kg/m^2
+        # represents a substantial increase in joint stress.
+        node_2_condition_satisfied = (_body_mass_index > 28.0) # BMI threshold (kg/m^2)
+        truth_values.append(1 if node_2_condition_satisfied else 0)
+
+        if node_2_condition_satisfied:
+            # If a patient is a coper or surgically reconstructed BUT has a high BMI,
+            # the increased mechanical stress makes 'abnormal' cartilage change more likely.
+            prediction = 'abnormal'
+        else:
+            # If a patient is a coper or surgically reconstructed AND has a reasonable BMI,
+            # indicating good coping/stabilization and reduced mechanical loading,
+            # the prognosis for 12-month change is 'normal'.
+            prediction = 'normal'
+
+    return prediction, truth_values
+```

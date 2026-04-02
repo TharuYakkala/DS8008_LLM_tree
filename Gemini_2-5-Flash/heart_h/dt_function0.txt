@@ -1,0 +1,47 @@
+```python
+def predict_heart_disease(age, sex, Chest_Pain_Type, Resting_Blood_Pressure, Serum_Cholesterol, Fasting_Blood_Sugar, Resting_Electrocardiographic_Results, Maximum_Heart_Rate_Achieved, Exercise_Induced_Angina, ST_Depression_Induced_by_Exercise_Relative_to_Rest, Slope_of_the_Peak_Exercise_ST_Segment, Number_of_Major_Vessels_Colored_by_Fluoroscopy, Thalassemia):
+    """
+    Predicts the presence of heart disease based on patient features using a depth-2 decision tree.
+
+    Args:
+        age (int): Age in years.
+        sex (str): 'male' or 'female'.
+        Chest_Pain_Type (str): 'Typical angina', 'Atypical angina', 'Non-anginal pain', 'Asymptomatic'.
+        Resting_Blood_Pressure (int): Resting blood pressure in mmHg.
+        Serum_Cholesterol (int): Serum cholesterol in mg/dl.
+        Fasting_Blood_Sugar (str): 'true' if fasting blood sugar > 120 mg/dl, 'false' otherwise.
+        Resting_Electrocardiographic_Results (str): 'Normal', 'Having ST-T wave abnormality', 'Showing probable or definite left ventricular hypertrophy by Estes\' criteria'.
+        Maximum_Heart_Rate_Achieved (int): Maximum heart rate achieved during exercise.
+        Exercise_Induced_Angina (str): 'yes' or 'no'.
+        ST_Depression_Induced_by_Exercise_Relative_to_Rest (float): ST depression value induced by exercise relative to rest (0 to 5).
+        Slope_of_the_Peak_Exercise_ST_Segment (str): 'Upsloping', 'Flat', 'Downsloping'.
+        Number_of_Major_Vessels_Colored_by_Fluoroscopy (int): Number of major vessels (0-3) colored by fluoroscopy.
+        Thalassemia (str): 'Normal', 'Fixed defect', 'Reversible defect'.
+
+    Returns:
+        tuple: (prediction, node_truth_values)
+            prediction (int): 1 if heart disease, 0 if no heart disease.
+            node_truth_values (list): A list of 1s and 0s representing the truth values of the inner node
+                                       conditions encountered during evaluation (1 if condition true, 0 if false).
+    """
+    node_truth_values = []
+    prediction = None
+
+    # Root Node: Number of Major Vessels Colored by Fluoroscopy (a direct indicator of CAD severity)
+    # Condition 1: If 1 or more major vessels are blocked, strongly indicates heart disease.
+    if Number_of_Major_Vessels_Colored_by_Fluoroscopy >= 1:
+        node_truth_values.append(1)  # Condition of Node 1 (>=1 vessel) is true
+        prediction = 1  # Predict Heart Disease
+    else:
+        node_truth_values.append(0)  # Condition of Node 1 (>=1 vessel) is false (meaning 0 vessels)
+        # Child Node (for cases with 0 major vessels): ST Depression Induced by Exercise Relative to Rest
+        # Condition 2: Significant ST depression during exercise often indicates myocardial ischemia.
+        if ST_Depression_Induced_by_Exercise_Relative_to_Rest > 1.0:
+            node_truth_values.append(1)  # Condition of Node 2 (>1.0 ST depression) is true
+            prediction = 1  # Predict Heart Disease
+        else:
+            node_truth_values.append(0)  # Condition of Node 2 (>1.0 ST depression) is false (meaning <=1.0)
+            prediction = 0  # Predict No Heart Disease
+
+    return prediction, node_truth_values
+```

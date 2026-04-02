@@ -1,0 +1,57 @@
+```python
+def classify_labor_negotiation_outcome(
+    duration_of_agreement,
+    wage_increase_in_first_year_of_contract,
+    wage_increase_in_second_year_of_contract,
+    wage_increase_in_third_year_of_contract,
+    cost_of_living_adjustment,
+    number_of_working_hours_during_week,
+    employer_contributions_to_pension_plan,
+    standby_pay,
+    shift_differencial_supplement_for_work_on_2_and_3_shift,
+    education_allowance,
+    number_of_statutory_holidays,
+    number_of_paid_vacation_days,
+    employers_help_during_employee_longterm_disability,
+    employers_contribution_towards_the_dental_plan,
+    employers_financial_contribution_towards_the_covering_the_costs_of_bereavement,
+    employer_s_contribution_towards_the_health_plan
+):
+    # Rename features for clarity and easier use in the decision tree
+    employer_health_plan_contribution = employer_s_contribution_towards_the_health_plan
+    wage_increase_1st_year = wage_increase_in_first_year_of_contract
+    cola_type = cost_of_living_adjustment
+
+    # List to store truth values of the inner nodes encountered on the path
+    node_truth_values = []
+    prediction = "bad" # Default prediction
+
+    # Node 1: Root Node - Focus on a major employee benefit: health plan contribution
+    # Condition: Is the employer's contribution to the health plan 'full'?
+    if employer_health_plan_contribution == 'full':
+        node_truth_values.append(1) # Condition for Node 1 is True
+        # Path for 'full' health plan contribution (strong positive indicator)
+
+        # Node 2 (Child of Node 1 - True branch): Check for initial wage increase
+        # Condition: Is the wage increase in the first year decent (e.g., 4% or more)?
+        if wage_increase_1st_year >= 4:
+            node_truth_values.append(1) # Condition for Node 2 is True
+            prediction = "good" # Full health plan and good initial wage increase
+        else:
+            node_truth_values.append(0) # Condition for Node 2 is False
+            prediction = "bad" # Full health plan, but a low initial wage increase might indicate other weaknesses
+    else:
+        node_truth_values.append(0) # Condition for Node 1 is False (health plan is 'half' or 'none')
+        # Path for 'half' or 'none' health plan contribution (less positive indicator)
+
+        # Node 3 (Child of Node 1 - False branch): Check for cost of living adjustment
+        # Condition: Is there a 'total compensation adjustment' for COLA (the best form)?
+        if cola_type == 'total compensation adjustment':
+            node_truth_values.append(1) # Condition for Node 3 is True
+            prediction = "good" # Subpar health plan, but excellent COLA provides strong long-term security
+        else:
+            node_truth_values.append(0) # Condition for Node 3 is False
+            prediction = "bad" # Subpar health plan AND no strong COLA indicates a generally weak outcome
+
+    return prediction, node_truth_values
+```

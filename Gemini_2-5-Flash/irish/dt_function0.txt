@@ -1,0 +1,42 @@
+```python
+def predict_school_leaving_certificate(sex, drumcondra_score, educational_level, father_prestige, school_type):
+    """
+    Predicts whether a school leaving certificate is taken based on key features,
+    using a decision tree with a maximum depth of 2.
+
+    Args:
+        sex (str): 'male' or 'female'.
+        drumcondra_score (int/float): Score from the Drumcondra Verbal Reasoning Test.
+        educational_level (int): Educational level attained (0 to 10).
+        father_prestige (int): Prestige score for father's occupation (0 to 28).
+        school_type (str): Type of school ('secondary', 'vocational', 'primary terminal leaver').
+
+    Returns:
+        tuple: A tuple containing:
+            - int: The prediction (1 if certificate is taken, 0 if not taken).
+            - list: A list representing the truth values of the inner nodes (1 if condition satisfied, 0 otherwise).
+    """
+    truth_values = []
+    prediction = None
+
+    # Node 1 (Root): Type of school
+    # The 'primary terminal leaver' category strongly indicates a path not leading to a secondary leaving certificate.
+    if school_type == 'primary terminal leaver':
+        truth_values.append(1)  # Condition 'school_type == "primary terminal leaver"' is true
+        prediction = 0  # Predict: School leaving certificate is NOT taken
+    else:
+        truth_values.append(0)  # Condition 'school_type == "primary terminal leaver"' is false
+
+        # Node 2 (Child of Node 1, if school_type is NOT 'primary terminal leaver'): Drumcondra Verbal Reasoning Test Score
+        # For students in secondary or vocational schools, academic aptitude is a primary driver for completing
+        # and taking a leaving certificate. A higher score signifies better academic potential.
+        # (Threshold of 65 is a heuristic based on general test score distributions for "above average" performance.)
+        if drumcondra_score > 65:
+            truth_values.append(1)  # Condition 'drumcondra_score > 65' is true
+            prediction = 1  # Predict: School leaving certificate IS taken
+        else:
+            truth_values.append(0)  # Condition 'drumcondra_score > 65' is false
+            prediction = 0  # Predict: School leaving certificate is NOT taken (due to lower academic aptitude)
+
+    return prediction, truth_values
+```

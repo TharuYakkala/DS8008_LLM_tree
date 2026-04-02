@@ -1,0 +1,42 @@
+```python
+def classify_party(features: dict) -> (str, list):
+    """
+    Classifies party affiliation (Democrat or Republican) based on voting records.
+
+    Args:
+        features (dict): A dictionary where keys are vote issues and values are 'yes' or 'no'.
+                         Expected keys for this tree include:
+                         - 'Vote on aid to Nicaraguan contras'
+                         - 'Vote on MX missile'
+                         - 'Vote on education spending'
+
+    Returns:
+        tuple: A tuple containing:
+               - str: The predicted party affiliation ('Democrat' or 'Republican').
+               - list: A list of truth values (1 for satisfied, 0 for not satisfied)
+                       for the inner node conditions encountered along the decision path.
+    """
+    truth_values = []
+
+    # Node 1: Root Node - Condition: Vote on aid to Nicaraguan contras == 'yes'
+    if features['Vote on aid to Nicaraguan contras'] == 'yes':
+        truth_values.append(1) # Condition for Node 1 is satisfied
+        
+        # Node 2: Left Child of Root - Condition: Vote on MX missile == 'yes'
+        if features['Vote on MX missile'] == 'yes':
+            truth_values.append(1) # Condition for Node 2 is satisfied
+            return "Republican", truth_values
+        else: # features['Vote on MX missile'] == 'no'
+            truth_values.append(0) # Condition for Node 2 is not satisfied
+            return "Democrat", truth_values
+    else: # features['Vote on aid to Nicaraguan contras'] == 'no'
+        truth_values.append(0) # Condition for Node 1 is not satisfied
+        
+        # Node 3: Right Child of Root - Condition: Vote on education spending == 'yes'
+        if features['Vote on education spending'] == 'yes':
+            truth_values.append(1) # Condition for Node 3 is satisfied
+            return "Democrat", truth_values
+        else: # features['Vote on education spending'] == 'no'
+            truth_values.append(0) # Condition for Node 3 is not satisfied
+            return "Republican", truth_values
+```

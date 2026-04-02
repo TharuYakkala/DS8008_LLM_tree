@@ -1,0 +1,93 @@
+```python
+def predict_cartilage_thickness_change(
+    group: str,
+    sex: str,
+    height: float,
+    body_mass: float,
+    body_mass_index: float,
+    age: int,
+    Lysholm_score: int,
+    IKDC_score: int,
+    Tegner_score: int,
+    baseline_mean_cartilage_thickness_CMF: float,
+    baseline_mean_T2_deep_CMF: float,
+    baseline_mean_T2_superficial_CMF: float,
+    external_peak_knee_moment_x: float,
+    external_peak_knee_moment_y: float,
+    external_peak_knee_moment_z: float,
+    dominant_leg: str,
+    days_from_injury_to_baseline_MRI: int
+) -> tuple[str, list[int]]:
+    """
+    Predicts whether the cartilage thickness change in the central medial femur
+    over 12 months following anterior cruciate ligament injury is normal or abnormal.
+
+    This decision tree is induced based on expert domain knowledge of risk factors
+    for cartilage degeneration after ACL injury, without relying on actual data training.
+    It identifies key features that are strong determinants of cartilage health and progression.
+
+    Features used (based on importance):
+    1.  baseline_mean_T2_deep_CMF (ms): Baseline mean T2 values for the deep cartilage layers in the central medial femur.
+        Elevated T2 values are a strong indicator of early cartilage matrix degeneration.
+    2.  body_mass_index (kg/m^2): Body mass index. Higher BMI increases mechanical loading on the knee joint,
+        a significant contributor to cartilage wear.
+    3.  group (coper / noncoper / surgical reconstruction): The patient's management or coping strategy
+        post-ACL injury, influencing knee stability and long-term biomechanics. 'Copers' often
+        demonstrate better adaptive mechanisms.
+
+    Args:
+        group (str): Patient's group ('coper', 'noncoper', 'surgical reconstruction').
+        sex (str): Patient's sex ('female', 'male').
+        height (float): Patient's height in cm.
+        body_mass (float): Patient's body mass in kg.
+        body_mass_index (float): Patient's body mass index in kg/m^2.
+        age (int): Patient's age in years.
+        Lysholm_score (int): Lysholm knee score.
+        IKDC_score (int): International Knee Documentation Committee (IKDC) score.
+        Tegner_score (int): Tegner activity score.
+        baseline_mean_cartilage_thickness_CMF (float): Baseline mean cartilage thickness in the central medial femur in mm.
+        baseline_mean_T2_deep_CMF (float): Baseline mean T2 values for the deep cartilage layers in the central medial femur in ms.
+        baseline_mean_T2_superficial_CMF (float): Baseline mean T2 values for the superficial cartilage layers in the central medial femur in ms.
+        external_peak_knee_moment_x (float): External peak knee moment around x-axis in Nm.
+        external_peak_knee_moment_y (float): External peak knee moment around y-axis in Nm.
+        external_peak_knee_moment_z (float): External peak knee moment around z-axis in Nm.
+        dominant_leg (str): Dominant leg ('left', 'right').
+        days_from_injury_to_baseline_MRI (int): Number of days from injury to baseline MRI.
+
+    Returns:
+        A tuple containing:
+        - A string: The predicted outcome ("normal" or "abnormal").
+        - A list of integers: Truth values for the conditions of the inner nodes encountered.
+          The first element corresponds to the root node, and the second to the child node along the path.
+          (1 if condition satisfied, 0 otherwise).
+    """
+    truth_values = []
+    prediction = ""
+
+    # Root Node: Check baseline deep cartilage health using T2 values.
+    # A threshold of 45 ms is a common indicator of early cartilage matrix degeneration.
+    if baseline_mean_T2_deep_CMF <= 45.0:
+        truth_values.append(1)  # Condition `baseline_mean_T2_deep_CMF <= 45.0` is TRUE
+        # Left Branch (Relatively healthy baseline deep cartilage)
+        # Next, consider mechanical loading via Body Mass Index.
+        # A BMI > 27.5 kg/m^2 suggests increased mechanical stress, a risk factor even for healthy cartilage.
+        if body_mass_index <= 27.5:
+            truth_values.append(1)  # Condition `body_mass_index <= 27.5` is TRUE
+            prediction = "normal"  # Healthy baseline T2 and lower mechanical load
+        else:
+            truth_values.append(0)  # Condition `body_mass_index <= 27.5` is FALSE
+            prediction = "abnormal" # Healthy baseline T2 but higher mechanical load
+    else:
+        truth_values.append(0)  # Condition `baseline_mean_T2_deep_CMF <= 45.0` is FALSE
+        # Right Branch (Degenerated baseline deep cartilage)
+        # Given existing degeneration, the patient's coping strategy or intervention group
+        # becomes crucial for progression. 'Copers' might adapt better, mitigating further damage.
+        if group == 'coper':
+            truth_values.append(1)  # Condition `group == 'coper'` is TRUE
+            prediction = "normal"  # Degenerated baseline but good adaptation (coper)
+        else:
+            truth_values.append(0)  # Condition `group == 'coper'` is FALSE
+            prediction = "abnormal" # Degenerated baseline with less optimal adaptation (noncoper/surgical)
+
+    return prediction, truth_values
+```

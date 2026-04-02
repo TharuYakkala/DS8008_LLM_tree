@@ -1,0 +1,52 @@
+```python
+def predict_survival(age, sex, steroids, antivirals, fatigue, malaise, anorexia, liver_big, liver_firm, spleen_palpable, spider_angiomata, ascites, varices, bilirubin, alkaline_phosphatase, serum_glutamic_oxaloacetic_transaminase_level, albumin_level, prothrombin_time, histologic_data):
+    """
+    Predicts patient survival based on given features using a decision tree.
+
+    Args:
+        age (int): Age of the patient in years.
+        sex (str): Sex of the patient ('male' or 'female').
+        steroids (str): Whether the patient is on steroids ('yes' or 'no').
+        antivirals (str): Whether the patient is on antivirals ('yes' or 'no').
+        fatigue (str): Presence of fatigue ('yes' or 'no').
+        malaise (str): Presence of malaise ('yes' or 'no').
+        anorexia (str): Presence of anorexia ('yes' or 'no').
+        liver_big (str): Whether the liver is enlarged ('yes' or 'no').
+        liver_firm (str): Whether the liver is firm to palpation ('yes' or 'no').
+        spleen_palpable (str): Whether the spleen is palpable ('yes' or 'no').
+        spider_angiomata (str): Presence of spider angiomata ('yes' or 'no').
+        ascites (str): Presence of ascites ('yes' or 'no').
+        varices (str): Presence of varices ('yes' or 'no').
+        bilirubin (float): Bilirubin level in mg/dL.
+        alkaline_phosphatase (float): Alkaline phosphatase level in units/liter.
+        serum_glutamic_oxaloacetic_transaminase_level (float): SGOT level in units/liter.
+        albumin_level (float): Albumin level in g/dL.
+        prothrombin_time (float): Prothrombin time in seconds.
+        histologic_data (str): Presence of histologic data ('yes' or 'no').
+
+    Returns:
+        tuple: A tuple containing the prediction ('survives' or 'dies') and
+               a list of truth values for the inner nodes.
+               The list contains 1 if the condition of the corresponding inner node
+               is satisfied, and 0 otherwise.
+    """
+    inner_nodes = []
+    prediction = ""
+
+    # Root Node: Prothrombin time (seconds) - a critical indicator of liver synthetic function
+    if prothrombin_time > 25.0:  # Severely prolonged prothrombin time
+        inner_nodes.append(1)  # Condition 'prothrombin_time > 25.0' is true
+        prediction = "dies"
+    else:  # Prothrombin time is not severely prolonged (<= 25.0)
+        inner_nodes.append(0)  # Condition 'prothrombin_time > 25.0' is false
+
+        # Second level Node: Albumin level (g/dL) - another key indicator of liver synthetic function and overall health
+        if albumin_level <= 3.0:  # Low albumin level
+            inner_nodes.append(1)  # Condition 'albumin_level <= 3.0' is true
+            prediction = "dies"
+        else:  # Healthy albumin level (> 3.0)
+            inner_nodes.append(0)  # Condition 'albumin_level <= 3.0' is false
+            prediction = "survives"
+
+    return prediction, inner_nodes
+```

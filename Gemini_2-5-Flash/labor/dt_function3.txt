@@ -1,0 +1,41 @@
+```python
+def classify_negotiation_outcome(
+    duration_of_agreement,
+    wage_increase_in_first_year_of_contract,
+    wage_increase_in_second_year_of_contract,
+    wage_increase_in_third_year_of_contract,
+    cost_of_living_adjustment,
+    number_of_working_hours_during_week,
+    employer_contributions_to_pension_plan,
+    standby_pay,
+    shift_differencial,
+    education_allowance,
+    number_of_statutory_holidays,
+    number_of_paid_vacation_days,
+    employer_s_help_during_employee_longterm_disability,
+    employers_contribution_towards_the_dental_plan,
+    employer_s_financial_contribution_towards_the_covering_the_costs_of_bereavement,
+    employer_s_contribution_towards_the_health_plan
+):
+    inner_node_truth_values = []
+
+    # Root Node Split: Is the employer's contribution towards the health plan 'full'?
+    # This is a critical benefit for employees.
+    if employer_s_contribution_towards_the_health_plan == 'full':
+        inner_node_truth_values.append(1)  # Condition of the first inner node is satisfied
+        # Path 1: Full health contribution. This is a very strong positive indicator.
+        return 'good', inner_node_truth_values
+    else:
+        inner_node_truth_values.append(0)  # Condition of the first inner node is not satisfied
+        # Inner Node 2 Split: If health contribution is not full, check for cost of living adjustment.
+        # Cost of living adjustment is another fundamental protection against inflation.
+        if cost_of_living_adjustment == 'total compensation adjustment':
+            inner_node_truth_values.append(1)  # Condition of the second inner node is satisfied
+            # Path 2.1: Even without full health, a total compensation adjustment for COLA is a significant positive.
+            return 'good', inner_node_truth_values
+        else:
+            inner_node_truth_values.append(0)  # Condition of the second inner node is not satisfied
+            # Path 2.2: Neither full health contribution nor a total cost of living adjustment (meaning 'none' or 'temporary').
+            # This combination points to a less favorable outcome for employees.
+            return 'bad', inner_node_truth_values
+```

@@ -1,0 +1,71 @@
+```python
+def classify_party_affiliation(
+    Vote_on_the_issue_of_handicapped_infants,
+    Vote_on_water_project_cost_sharing,
+    Vote_on_adoption_of_the_budget_resolution,
+    Vote_on_physician_fee_freeze,
+    Vote_on_aid_to_El_Salvador,
+    Vote_on_allowing_religious_groups_in_schools,
+    Vote_on_anti_satellite_test_ban,
+    Vote_on_aid_to_Nicaraguan_contras,
+    Vote_on_MX_missile,
+    Vote_on_immigration,
+    Vote_on_synfuels_corporation_cutback,
+    Vote_on_education_spending,
+    Vote_on_superfund_right_to_sue,
+    Vote_on_crime,
+    Vote_on_duty_free_exports,
+    Vote_on_Export_Administration_Act_South_Africa
+):
+    """
+    Classifies party affiliation (Democrat or Republican) based on voting records.
+    The tree has a maximum depth of 2, utilizing the most indicative features
+    from the given list, based on historical political patterns in the US.
+
+    Args:
+        All vote features as 'yes' or 'no' strings.
+
+    Returns:
+        A tuple containing:
+        - The predicted party affiliation ('Democrat' or 'Republican').
+        - A list of integers (1 for True, 0 for False) representing the
+          truth values of the conditions of the inner nodes traversed
+          during the prediction path.
+    """
+    inner_node_truth_values = []
+
+    # Node 0 (Root Node): A defining foreign policy issue of the 1980s.
+    # Opposition to aid for Nicaraguan Contras was a strong Democratic stance.
+    if Vote_on_aid_to_Nicaraguan_contras == 'no':
+        inner_node_truth_values.append(1)  # Condition 'Vote on aid to Nicaraguan contras == "no"' is True
+        # Path for likely Democrats
+
+        # Node 1 (Left Child): Another major defense/foreign policy issue.
+        # Opposition to the MX missile program further cements a Democratic leaning.
+        if Vote_on_MX_missile == 'no':
+            inner_node_truth_values.append(1)  # Condition 'Vote on MX missile == "no"' is True
+            prediction = 'Democrat'
+        else: # Vote_on_MX_missile == 'yes'
+            inner_node_truth_values.append(0)  # Condition 'Vote on MX missile == "no"' is False
+            # This path suggests a voter who opposed Contras (Democrat-leaning)
+            # but supported MX missile (Republican-leaning on defense).
+            # Given the depth constraint, we classify as Republican to catch this blend.
+            prediction = 'Republican'
+    else: # Vote_on_aid_to_Nicaraguan_contras == 'yes'
+        inner_node_truth_values.append(0)  # Condition 'Vote on aid to Nicaraguan contras == "no"' is False
+        # Path for likely Republicans
+
+        # Node 2 (Right Child): A key social issue dividing the parties.
+        # Support for allowing religious groups in schools was a strong Republican stance.
+        if Vote_on_allowing_religious_groups_in_schools == 'yes':
+            inner_node_truth_values.append(1)  # Condition 'Vote on allowing religious groups in schools == "yes"' is True
+            prediction = 'Republican'
+        else: # Vote_on_allowing_religious_groups_in_schools == 'no'
+            inner_node_truth_values.append(0)  # Condition 'Vote on allowing religious groups in schools == "yes"' is False
+            # This path suggests a voter who supported Contras (Republican-leaning)
+            # but opposed religious groups in schools (Democrat-leaning on social issues).
+            # Given the depth constraint, we classify as Democrat to catch this blend.
+            prediction = 'Democrat'
+
+    return prediction, inner_node_truth_values
+```

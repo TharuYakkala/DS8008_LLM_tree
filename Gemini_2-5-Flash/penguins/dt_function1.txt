@@ -1,0 +1,39 @@
+```python
+def predict_penguin_species(island, culmen_length_mm, culmen_depth_mm, flipper_length_mm, body_mass_g, sex):
+    """
+    Classifies the species of a penguin (Adelie, Chinstrap, Gentoo) based on its features.
+
+    Parameters:
+    - island (str): The island where the penguin was found (e.g., "Biscoe", "Dream", "Torgersen").
+    - culmen_length_mm (float): The length of the culmen (bill) in millimeters.
+    - culmen_depth_mm (float): The depth of the culmen (bill) in millimeters.
+    - flipper_length_mm (float): The length of the flipper in millimeters.
+    - body_mass_g (float): The body mass of the penguin in grams.
+    - sex (str): The sex of the penguin (e.g., "male", "female").
+
+    Returns:
+    - tuple: A tuple containing the predicted species (str) and a list of truth values (int)
+             for the inner nodes traversed. 1 if the condition was satisfied, 0 otherwise.
+             The list follows the traversal path.
+    """
+    inner_node_truth_values = []
+
+    # Node 1 (Root Node): Differentiate Gentoo (larger flipper length) from Adelie/Chinstrap
+    # Condition: flipper length (mm) > 205.0
+    if flipper_length_mm > 205.0:
+        inner_node_truth_values.append(1)  # Condition satisfied (flipper length is large)
+        prediction = "Gentoo"
+    else:
+        inner_node_truth_values.append(0)  # Condition not satisfied (flipper length is not large)
+        # Node 2 (Child Node): Differentiate Chinstrap (longer culmen) from Adelie
+        # This node is reached if flipper length <= 205.0
+        # Condition: culmen length (mm) > 43.0
+        if culmen_length_mm > 43.0:
+            inner_node_truth_values.append(1)  # Condition satisfied (culmen length is longer)
+            prediction = "Chinstrap"
+        else:
+            inner_node_truth_values.append(0)  # Condition not satisfied (culmen length is shorter)
+            prediction = "Adelie"
+
+    return prediction, inner_node_truth_values
+```

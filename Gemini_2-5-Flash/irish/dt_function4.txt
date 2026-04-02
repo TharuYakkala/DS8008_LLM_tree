@@ -1,0 +1,63 @@
+```python
+def classify_school_leaving_certificate(sex, drumcondra_verbal_reasoning_test_score, educational_level_attained, prestige_score_fathers_occupation, type_of_school):
+    """
+    Classifies whether a school leaving certificate is taken based on educational features,
+    using a decision tree with a maximum depth of 2.
+
+    Args:
+        sex (str): 'male' or 'female'.
+        drumcondra_verbal_reasoning_test_score (int): Score on the Drumcondra Verbal Reasoning Test.
+        educational_level_attained (int): Educational level attained (0 to 10).
+        prestige_score_fathers_occupation (int): Prestige score for father's occupation (0 to 28).
+        type_of_school (str): 'secondary', 'vocational', or 'primary terminal leaver'.
+
+    Returns:
+        tuple: A tuple containing:
+            - str: "Taken" or "Not Taken" - the predicted class.
+            - list: A list of 1s and 0s representing truth values of the inner node conditions.
+                    The order of conditions is fixed:
+                    1. Root Node: `type_of_school == 'secondary'`
+                    2. Child Node (True branch of Root): `educational_level_attained > 7`
+                    3. Child Node (False branch of Root): `educational_level_attained <= 6`
+                    Entries are 1 if the condition is satisfied (True), 0 otherwise (False).
+    """
+    # Initialize the list for all 3 potential inner node conditions.
+    # This ensures a fixed length list, with 0s for conditions not met or not relevant to the path.
+    inner_node_truth_values = [0, 0, 0]
+
+    # Node 1: Root Node - Type of school
+    # Condition 1: Is the school type 'secondary'?
+    if type_of_school == 'secondary':
+        inner_node_truth_values[0] = 1  # Condition 1 is True
+
+        # Node 2 (Child of Node 1, True branch): Educational level attained
+        # Condition 2: Did they attain a high enough educational level in secondary school?
+        # (Assuming 'educational_level_attained > 7' indicates reaching Senior Cycle,
+        # where the Leaving Certificate is typically taken.)
+        if educational_level_attained > 7:
+            inner_node_truth_values[1] = 1  # Condition 2 is True
+            # Node 3's condition is not applicable on this path, so its value remains 0.
+            return "Taken", inner_node_truth_values
+        else:
+            inner_node_truth_values[1] = 0  # Condition 2 is False
+            # Node 3's condition is not applicable on this path, so its value remains 0.
+            # If in secondary school but low educational attainment, they likely left before taking the cert.
+            return "Not Taken", inner_node_truth_values
+    else:  # type_of_school is 'vocational' or 'primary terminal leaver'
+        inner_node_truth_values[0] = 0  # Condition 1 is False
+
+        # Node 2's condition is not applicable on this path, so its value remains 0.
+
+        # Node 3 (Child of Node 1, False branch): Educational level attained
+        # Condition 3: Did they attain a very low educational level (e.g., primary only or early dropout)?
+        # (Assuming 'educational_level_attained <= 6' indicates primary education or early secondary dropout,
+        # making the academic Leaving Certificate highly unlikely.)
+        if educational_level_attained <= 6:
+            inner_node_truth_values[2] = 1  # Condition 3 is True
+            return "Not Taken", inner_node_truth_values
+        else:  # educational_level_attained > 6, but not in secondary school (primarily vocational here)
+            inner_node_truth_values[2] = 0  # Condition 3 is False
+            # Even with higher attainment in a vocational school, the academic Leaving Certificate is generally not taken.
+            # If 'primary terminal leaver' and high attainment, it's an edge case not leading to Leaving Cert.
+            return "Not Taken", inner_node_truth_values
+```

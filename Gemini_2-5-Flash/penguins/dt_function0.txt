@@ -1,0 +1,40 @@
+```python
+def classify_penguin(island, culmen_length_mm, culmen_depth_mm, flipper_length_mm, body_mass_g, sex):
+    """
+    Classifies the species of a penguin based on its physical characteristics using a decision tree.
+
+    Args:
+        island (str): The island where the penguin was observed (e.g., "Biscoe", "Dream", "Torgersen").
+        culmen_length_mm (float): Length of the culmen (bill) in millimeters.
+        culmen_depth_mm (float): Depth of the culmen (bill) in millimeters.
+        flipper_length_mm (float): Length of the flipper in millimeters.
+        body_mass_g (float): Body mass in grams.
+        sex (str): Sex of the penguin (e.g., "male", "female").
+
+    Returns:
+        tuple: A tuple containing:
+            - str: The predicted species ('Adelie', 'Chinstrap', 'Gentoo').
+            - list: A list of truth values for inner nodes, where 1 means the condition
+                    of the corresponding inner node was satisfied, and 0 otherwise.
+    """
+    node_truth_values = []
+
+    # Node 1: Primary split based on flipper length (effectively separating Gentoo from Adelie/Chinstrap)
+    # Condition: flipper length (mm) <= 205.0
+    if flipper_length_mm <= 205.0:
+        node_truth_values.append(1)  # Condition 1 is satisfied
+        
+        # Node 2: Secondary split based on culmen length (differentiating Adelie from Chinstrap)
+        # This node is reached if flipper_length_mm <= 205.0
+        # Condition: culmen length (mm) <= 44.0
+        if culmen_length_mm <= 44.0:
+            node_truth_values.append(1)  # Condition 2 is satisfied
+            return "Adelie", node_truth_values
+        else:
+            node_truth_values.append(0)  # Condition 2 is not satisfied
+            return "Chinstrap", node_truth_values
+    else:
+        node_truth_values.append(0)  # Condition 1 is not satisfied
+        # This path leads directly to a leaf node as flipper length > 205.0 is highly indicative of Gentoo.
+        return "Gentoo", node_truth_values
+```

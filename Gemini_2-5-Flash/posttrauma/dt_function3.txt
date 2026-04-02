@@ -1,0 +1,33 @@
+```python
+def predict_outcome(age_years, body_mass_index_kg_m2, gender_at_birth, ethnicity, education_age, work_status, smoke_status, hospital_stay_days, injury_severity_score_total, injury_severity_score_category, number_of_fractures, penetrating_injury, eq5d_5l, eq5d_vas, sf36v2_mental, sf36v2_physical, hads_anxiety, hads_depression, tsk_11_total, pseq_total, ies_r_total, ies_r_avoidance, ies_r_hyperarousal, ies_r_intrusion, pain_intensity_average, pain_intensity_current, pain_intensity_worst, pain_intensity_least, pain_region_count, pain_extent_percent, paindetect_total, sleep_quality_last_24_hours, sleep_quality_since_injury, local_heat_pain_threshold, remote_heat_pain_threshold, local_cold_pain_threshold, remote_cold_pain_threshold, local_pressure_pain_threshold_kpa, remote_pressure_pain_threshold_kpa, c_reactive_protein_mg_l):
+    
+    # Define the order of inner nodes for the truth values list:
+    # 1. Condition for the root node: injury_severity_score_total <= 15
+    # 2. Condition for the left child node (if root is True): hads_anxiety > 7
+    # 3. Condition for the right child node (if root is False): pseq_total > 40
+    inner_node_truths = [0, 0, 0] 
+    
+    # Root Node: Check injury severity
+    if injury_severity_score_total <= 15: # Condition for Node 1: Moderate/Mild Injury
+        inner_node_truths[0] = 1 # Root node condition is satisfied
+        
+        # Left Child Node (Depth 1): Check HADS Anxiety
+        if hads_anxiety > 7: # Condition for Node 2: High anxiety (clinical cutoff)
+            inner_node_truths[1] = 1 # Left child node condition is satisfied
+            prediction = "bad"
+        else:
+            inner_node_truths[1] = 0 # Left child node condition is not satisfied
+            prediction = "good"
+    else: # injury_severity_score_total > 15 # Root node condition is not satisfied (Major Injury)
+        inner_node_truths[0] = 0 
+        
+        # Right Child Node (Depth 1): Check PSEQ Total
+        if pseq_total > 40: # Condition for Node 3: High Pain Self-Efficacy (protective factor)
+            inner_node_truths[2] = 1 # Right child node condition is satisfied
+            prediction = "good"
+        else:
+            inner_node_truths[2] = 0 # Right child node condition is not satisfied
+            prediction = "bad"
+            
+    return prediction, inner_node_truths
+```

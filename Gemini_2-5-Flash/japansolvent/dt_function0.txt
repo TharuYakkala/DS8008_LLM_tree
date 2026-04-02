@@ -1,0 +1,38 @@
+```python
+def predict_solvency(EBIT_TA, NI_TC, Sales_TA, EBIT_Sales, NI_Sales, WC_TA, E_TL, E_TA):
+    """
+    Predicts if a company is solvent based on financial ratios.
+
+    Parameters:
+    - EBIT_TA (float): Earnings Before Interest and Taxes / Total Assets
+    - NI_TC (float): Net Income / Total Capital
+    - Sales_TA (float): Sales / Total Assets
+    - EBIT_Sales (float): Earnings Before Interest and Taxes / Sales
+    - NI_Sales (float): Net Income / Sales
+    - WC_TA (float): Working Capital / Total Assets
+    - E_TL (float): Equity / Total Liabilities
+    - E_TA (float): Equity / Total Assets
+
+    Returns:
+    - tuple: A string indicating the prediction ("Solvent" or "Not Solvent")
+             and a list of truth values for the inner nodes.
+             Truth values are 1 if the condition is satisfied, 0 otherwise.
+    """
+    truth_values = []
+
+    # Node 1: Equity/Total Assets (E_TA) - A key indicator of leverage and financial structure.
+    # A higher E_TA indicates less reliance on debt and stronger solvency.
+    if E_TA > 0.4:  # If equity finances a significant portion of assets (e.g., > 40%)
+        truth_values.append(1)
+        return "Solvent", truth_values
+    else:  # If E_TA is low, indicating higher leverage
+        truth_values.append(0)
+        # Node 2: Working Capital/Total Assets (WC_TA) - Assesses short-term liquidity.
+        # Even with high leverage, positive working capital can indicate ability to meet short-term obligations.
+        if WC_TA > 0.05:  # If working capital is positive (e.g., > 5% of total assets)
+            truth_values.append(1)
+            return "Solvent", truth_values # High leverage but good liquidity might indicate solvency
+        else:  # If WC_TA is low or negative, indicating liquidity issues on top of high leverage
+            truth_values.append(0)
+            return "Not Solvent", truth_values
+```
