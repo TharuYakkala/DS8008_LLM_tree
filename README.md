@@ -35,8 +35,9 @@ DS8008_LLM_TREE
 │   ├── dt_extractor_colab.ipynb
 │   └── gemini_prompter.py
 ├──.gitignore
-├──Final_project_template.ipynb
-├──LICENSE
+├── LICENSE
+├── LLM_Trees_Abstract.pdf
+├──LLM_Trees_project_report.ipynb
 └──README.md
 ```
 
