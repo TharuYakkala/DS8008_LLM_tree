@@ -16,15 +16,30 @@ DS8008_LLM_TREE
 │   └── Gemini_outputs
 ├──src
 │   ├── Evaluators
-│   │   ├──bankruptcy.py
-│   │   ├─ boxing1.py
-│   │   ├─ boxing2.py
-│   │   ├─ colic.py
-│   │   ├─ creditcore.py
-│   │   ├─ evaluate_bankruptcy.py
-│   │   ├─ evaluate_boxing1.py
-│   │   ├─ evaluate_boxin2.py
-│   │   ├─ evaluate_colic.py
+│   │   ├──Embeddings
+│   │   │   ├── config.py
+│   │   │   ├── emb_generator_bankruptcy.py
+│   │   │   ├── emb_generator_boxing1.py
+│   │   │   ├── emb_generator_boxing2.py
+│   │   │   ├── emb_generator_colid.py
+│   │   │   ├── emb_generator_credit.py
+│   │   │   └── embedding_eval.py
+│   │   ├──model_extractors
+│   │   │   ├── bankruptcy_models.py
+│   │   │   ├── boxing1_models.py
+│   │   │   ├── boxing2_models.py
+│   │   │   ├── colic_models.py
+│   │   │   └── credit_models.py
+│   │   ├── bankruptcy.py
+│   │   ├── boxing1.py
+│   │   ├── boxing2.py
+│   │   ├── colic.py
+│   │   ├──creditcore.py
+│   │   ├── emb_eval_looper.py
+│   │   ├── evaluate_bankruptcy.py
+│   │   ├── evaluate_boxing1.py
+│   │   ├── evaluate_boxin2.py
+│   │   ├── evaluate_colic.py
 │   │   └── evaluate_creditcore.py
 │   ├── Figures
 │   │   ├── func_example_full.png
@@ -33,7 +48,8 @@ DS8008_LLM_TREE
 │   │   ├── sample_output2.png
 │   │   └── sample_return_format.png
 │   ├── dt_extractor_colab.ipynb
-│   └── gemini_prompter.py
+│   ├── gemini_prompter.py
+    └── plotter.py
 ├──.gitignore
 ├── LICENSE
 ├── LLM_Trees_Abstract.pdf

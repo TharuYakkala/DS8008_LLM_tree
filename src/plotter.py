@@ -34,6 +34,9 @@ def plot_emb_results(emb_df: pd.DataFrame, dataset: str):
         
         ax = pivot_table.plot(kind="bar", figsize=(10,6), legend=False, color=model_colors[model])
         
+        for container in ax.containers:
+            ax.bar_label(container, fmt="%.2f", padding=2)
+            
         # Set axis titles
         ax.set_title(f"{dataset} model={model}: F1-score per Embedding type")
         ax.set_xlabel("Embedding Type (ss=semi-supervised, s=supervised)")
