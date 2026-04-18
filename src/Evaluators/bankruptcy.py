@@ -33,35 +33,31 @@ def dt_function_0(WC_TA, RE_TA, EBIT_TA, S_TA, BVE_BVL):
     # 1: Condition for the left child node (EBIT_TA <= 0.0)
     # 2: Condition for the right child node (WC_TA <= 5.0)
     node_truth_values = [0, 0, 0]
+    node_truth_values[0] = int(BVE_BVL <= 0.75)
+    node_truth_values[1] = int(EBIT_TA <= 0.0)
+    node_truth_values[2] = int(WC_TA <= 5.0)
     prediction = ""
 
     # Node 0 (Root): Check Book Value of Equity / Book Value of Liabilities (BVE/BVL)
     # A low BVE/BVL (e.g., <= 0.75, meaning liabilities are at least 1.33 times equity)
     # indicates high leverage and significant solvency risk.
-    if BVE_BVL <= 0.75:
-        node_truth_values[0] = 1  # Root node condition satisfied (high leverage path)
-
+    if node_truth_values[0]:
         # Node 1 (Left Child): Check Earnings Before Interest and Tax / Total Assets (EBIT/TA)
         # If highly leveraged and not generating operational profit (EBIT <= 0), the firm is in severe distress.
-        if EBIT_TA <= 0.0:
-            node_truth_values[1] = 1  # Left child node condition satisfied
+        if node_truth_values[1]:
             prediction = "Bankrupt"
         else:
-            node_truth_values[1] = 0  # Left child node condition not satisfied
             # Even with high leverage, if operationally profitable, there might be a chance for survival.
             # This represents a less immediate risk compared to non-profitability under high leverage.
             prediction = "Non-Bankrupt"
     else:
-        node_truth_values[0] = 0  # Root node condition not satisfied (lower leverage path)
 
         # Node 2 (Right Child): Check Working Capital / Total Assets (WC/TA)
         # Even with healthy leverage, a firm can face bankruptcy due to severe liquidity problems.
         # A low WC/TA (e.g., <= 5.0%) suggests insufficient working capital.
-        if WC_TA <= 5.0:  # Assuming WC/TA is expressed as a percentage
-            node_truth_values[2] = 1  # Right child node condition satisfied
+        if node_truth_values[2]:  # Assuming WC/TA is expressed as a percentage
             prediction = "Bankrupt"
         else:
-            node_truth_values[2] = 0  # Right child node condition not satisfied
             # With both lower leverage and healthy liquidity, the firm is likely stable.
             prediction = "Non-Bankrupt"
 
@@ -97,14 +93,15 @@ def dt_function_1(features):
     bve_bvl = features['Book Value of Equity/Book Value of Liabilities']
 
     # Initialize list to store truth values for inner nodes
-    node_truth_values = []
     prediction = -1 # Default, should be overwritten
 
     # Root Node (Depth 0): Book Value of Equity / Book Value of Liabilities (BVE/BVL)
     # This ratio measures financial leverage. A value <= 0.5 indicates that equity is
     # half or less than total liabilities, which is a strong indicator of financial distress.
-    condition_bve_bvl_low = (bve_bvl <= 0.5)
-    node_truth_values.append(1 if condition_bve_bvl_low else 0)
+    condition_bve_bvl_low = int(bve_bvl <= 0.5)
+    condition_ebit_ta_negative = int(ebit_ta <= 0.0)
+    condition_wc_ta_negative = int(wc_ta <= 0.0)
+    node_truth_values = [condition_bve_bvl_low, condition_ebit_ta_negative, condition_wc_ta_negative]
 
     if condition_bve_bvl_low:
         # Path 1: High Leverage / Low Equity (BVE/BVL <= 0.5) - This path already suggests high risk.
@@ -112,7 +109,6 @@ def dt_function_1(features):
         # This measures operational profitability. A value <= 0.0 means the company is
         # operating at a loss or just breaking even, which is critical when combined with high leverage.
         condition_ebit_ta_negative = (ebit_ta <= 0.0)
-        node_truth_values.append(1 if condition_ebit_ta_negative else 0)
 
         if condition_ebit_ta_negative:
             # Prediction: Bankrupt (Extremely high risk: High leverage AND negative operational profitability)
@@ -126,8 +122,6 @@ def dt_function_1(features):
         # Node 1.2 (Depth 1): Working Capital / Total Assets (WC/TA)
         # This measures short-term liquidity. A value <= 0.0 indicates severe liquidity issues,
         # meaning current liabilities exceed current assets. Even with good leverage, poor liquidity can lead to bankruptcy.
-        condition_wc_ta_negative = (wc_ta <= 0.0)
-        node_truth_values.append(1 if condition_wc_ta_negative else 0)
 
         if condition_wc_ta_negative:
             # Prediction: Bankrupt (Leverage is okay, BUT facing a severe short-term liquidity crisis)
@@ -165,22 +159,20 @@ def dt_function_2(WC_TA, RE_TA, EBIT_TA, S_TA, BVE_BVL):
     # Initialize truth values for all inner nodes to 0.
     # The order corresponds to: [Node 0: BVE_BVL, Node 1: EBIT_TA, Node 2: WC_TA]
     truth_values = [0, 0, 0] 
-
+    truth_values[0] = int(BVE_BVL <= 0.1)
+    truth_values[1] = int(EBIT_TA <= -10)
+    truth_values[2] = int(WC_TA <= 0)
     prediction = "Not Bankrupt" # Default prediction for the least risky path
 
     # Node 0: Root node - Check solvency/leverage (Book Value of Equity / Book Value of Liabilities)
     # A very low BVE/BVL (e.g., 0.1 or less) indicates severe equity erosion and high financial distress.
     if BVE_BVL <= 0.1:
-        truth_values[0] = 1 # Condition for Node 0 is satisfied
-        
         # Branch Left: Firm is highly distressed due to poor solvency
         # Node 1: Check operational profitability (Earnings Before Interest and Taxes / Total Assets)
         # Even within a highly leveraged firm, severe operational losses accelerate bankruptcy.
         if EBIT_TA <= -10: # Significant operational losses (e.g., losing more than 10% of assets in earnings)
-            truth_values[1] = 1 # Condition for Node 1 is satisfied
             prediction = "Bankrupt"
         else: # Operational profits are not catastrophically negative, but still highly distressed from solvency.
-            truth_values[1] = 0 # Condition for Node 1 is not satisfied
             prediction = "Bankrupt" # Still predicts bankrupt due to the severe BVE_BVL condition
     else:
         truth_values[0] = 0 # Condition for Node 0 is not satisfied
@@ -189,10 +181,8 @@ def dt_function_2(WC_TA, RE_TA, EBIT_TA, S_TA, BVE_BVL):
         # Node 2: Check liquidity (Working Capital / Total Assets)
         # Even with decent equity, a company can go bankrupt if it cannot meet short-term obligations.
         if WC_TA <= 0: # Negative working capital indicates current liabilities exceed current assets (liquidity crisis)
-            truth_values[2] = 1 # Condition for Node 2 is satisfied
             prediction = "Bankrupt"
         else: # Positive working capital indicates better liquidity.
-            truth_values[2] = 0 # Condition for Node 2 is not satisfied
             prediction = "Not Bankrupt" # Firm appears relatively healthy based on these key indicators
 
     return prediction, truth_values
@@ -222,13 +212,15 @@ def dt_function_3(
                                Each entry in the list is 1 if the condition of the corresponding inner node
                                is satisfied, and 0 otherwise.
     """
-    truth_values = []
+    truth_values = [0, 0]
+    condition_node_0 = (Book_Value_of_Equity_Book_Value_of_Liabilities <= 0.2)
+    condition_node_1 = (Earnings_Before_Interest_and_Tax_Total_Assets <= 0)
+    truth_values[0] = int(condition_node_0)
+    truth_values[1] = int(condition_node_1)
 
     # Node 0: Book Value of Equity / Book Value of Liabilities (BVE/BVL) <= 0.2
     # Rationale: A very low BVE/BVL ratio (equity less than 20% of liabilities, or even negative)
     # is a critical indicator of severe financial distress and high insolvency risk.
-    condition_node_0 = (Book_Value_of_Equity_Book_Value_of_Liabilities <= 0.2)
-    truth_values.append(1 if condition_node_0 else 0)
 
     if condition_node_0:
         # If BVE/BVL is critically low, the firm is highly likely to be Bankrupt.
@@ -239,8 +231,6 @@ def dt_function_3(
         # Node 1 (right child of Node 0): Earnings Before Interest and Tax / Total Assets (EBIT/TA) <= 0
         # Rationale: Even if solvency appears somewhat stable, consistently operating at a loss
         # (negative or zero EBIT/TA) indicates an unsustainable business model and high risk of future bankruptcy.
-        condition_node_1 = (Earnings_Before_Interest_and_Tax_Total_Assets <= 0)
-        truth_values.append(1 if condition_node_1 else 0)
 
         if condition_node_1:
             prediction = "Bankrupt"
@@ -276,7 +266,10 @@ def dt_function_4(We_TA, RE_TA, EBIT_TA, S_TA, BVE_BVL):
                              2. EBIT_TA <= 0.0 (if Root node's TRUE branch is taken)
                              3. RE_TA <= -0.1 (if Root node's FALSE branch is taken)
     """
-    truth_values = []
+    truth_values = [0, 0, 0]
+    truth_values[0] = int(BVE_BVL <= 0.5)
+    truth_values[1] = int(EBIT_TA <= 0.0)
+    truth_values[2] = int(RE_TA <= -0.1)
     prediction = ""
 
     # Node 0 (Root Node): Book Value of Equity / Book Value of Liabilities (BVE/BVL)
@@ -284,31 +277,23 @@ def dt_function_4(We_TA, RE_TA, EBIT_TA, S_TA, BVE_BVL):
     # the company's equity is half or less of its liabilities, signaling high leverage
     # and a significant risk of insolvency.
     if BVE_BVL <= 0.5:
-        truth_values.append(1)  # Condition 1: BVE_BVL <= 0.5 is TRUE (High Leverage)
-
         # Node 1 (Child of Root TRUE branch): Earnings Before Interest and Tax / Total Assets (EBIT/TA)
         # For a highly leveraged firm, current operational profitability is critical.
         # If it's operating at a loss (EBIT/TA <= 0), bankruptcy risk is extremely high.
         if EBIT_TA <= 0.0:
-            truth_values.append(1)  # Condition 2: EBIT_TA <= 0.0 is TRUE (Operating at a loss)
             prediction = "BANKRUPT"
         else:
-            truth_values.append(0)  # Condition 2: EBIT_TA <= 0.0 is FALSE (Currently profitable)
             # A highly leveraged firm that is still generating positive operating earnings
             # might have a chance to service its debt and avoid bankruptcy, though still risky.
             prediction = "NON-BANKRUPT"
     else:
-        truth_values.append(0)  # Condition 1: BVE_BVL <= 0.5 is FALSE (Lower Leverage)
-
         # Node 2 (Child of Root FALSE branch): Retained Earnings / Total Assets (RE/TA)
         # For firms with healthier leverage, cumulative profitability is a key indicator.
         # Significant accumulated losses (RE/TA <= -0.1, meaning 10% or more of assets lost)
         # can deplete capital and lead to bankruptcy even if current leverage is moderate.
         if RE_TA <= -0.1:
-            truth_values.append(1)  # Condition 3: RE_TA <= -0.1 is TRUE (Significant cumulative losses)
             prediction = "BANKRUPT"
         else:
-            truth_values.append(0)  # Condition 3: RE_TA <= -0.1 is FALSE (Healthy or less severe cumulative earnings)
             # A firm with healthier leverage and no significant accumulated losses is
             # considered financially stable in this model.
             prediction = "NON-BANKRUPT"

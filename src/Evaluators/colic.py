@@ -25,24 +25,23 @@ def dt_function_0(Abdomen_Appearance: str, Degree_of_Pain: str) -> (str, list):
                     Each entry is 1 if the condition of the corresponding inner node is satisfied, and 0 otherwise.
     """
     
-    inner_node_truth_values = []
+    inner_node_truth_values = [0, 0]
+    inner_node_truth_values[0] = int(Abdomen_Appearance in ['distended small intestine', 'distended large intestine'])
+    inner_node_truth_values[1] = int(Degree_of_Pain == 'severe')
+
     prediction = None
 
     # Node 1: Abdomen Appearance
     # Condition: Is the abdomen appearance indicative of severe internal distension?
     if Abdomen_Appearance in ['distended small intestine', 'distended large intestine']:
-        inner_node_truth_values.append(1) # Condition 1 satisfied
         prediction = 'surgical'
     else:
-        inner_node_truth_values.append(0) # Condition 1 not satisfied
         
         # Node 2 (Child of Node 1's FALSE branch): Degree of Pain
         # Condition: Is the horse experiencing severe pain?
         if Degree_of_Pain == 'severe':
-            inner_node_truth_values.append(1) # Condition 2 satisfied
             prediction = 'surgical'
         else:
-            inner_node_truth_values.append(0) # Condition 2 not satisfied
             prediction = 'non-surgical'
             
     return prediction, inner_node_truth_values
@@ -68,12 +67,12 @@ def dt_function_1(features_dict):
             - list: A list representing the truth values of the inner nodes traversed.
                     1 if the condition was satisfied, 0 otherwise.
     """
-    node_truth_values = []
+    condition1 = features_dict['Abdominocentesis Appearance'] != 'clear'
+    condition2 = features_dict['Nasogastric Reflux'] == '>1 liter'
+    node_truth_values = [int(condition1), int(condition2)]
 
     # Node 1: Is Abdominocentesis Appearance abnormal (cloudy or serosanguinous)?
     # This is a strong indicator of peritonitis or compromised bowel.
-    condition1 = features_dict['Abdominocentesis Appearance'] != 'clear'
-    node_truth_values.append(1 if condition1 else 0)
 
     if condition1:
         # If abdominal fluid is not clear, it's highly indicative of a surgical lesion.
@@ -82,8 +81,6 @@ def dt_function_1(features_dict):
         # If abdominal fluid is clear, evaluate the next most critical feature.
         # Node 2: Is there significant Nasogastric Reflux (>1 liter)?
         # Large volume reflux often indicates a small intestinal obstruction.
-        condition2 = features_dict['Nasogastric Reflux'] == '>1 liter'
-        node_truth_values.append(1 if condition2 else 0)
 
         if condition2:
             # Even with clear abdominal fluid, significant reflux points to surgery.
@@ -106,32 +103,30 @@ def dt_function_2(
     Nasogastric_Reflux_pH, Rectal_Examination_Findings, Abdomen_Appearance, Packed_Cell_Volume,
     Total_Protein, Abdominocentesis_Appearance, Abdominocentesis_Total_Protein, Outcome
 ):
-    node_truths = []
+    node_truths = [0, 0, 0]
+    node_truths[0] = int(Degree_of_Pain == 'severe')
+    node_truths[0] = int(Nasogastric_Reflux == '>1 liter')
+    node_truths[0] = int(Abdomen_Appearance in ('distended small intestine', 'distended large intestine'))
+
 
     # Node 1 (Root): Is the horse experiencing severe pain? Severe pain is a strong indicator for surgical intervention.
     if Degree_of_Pain == 'severe':
-        node_truths.append(1)  # Condition: Degree_of_Pain == 'severe' is True
 
         # Node 2 (Left Child): If severe pain, is there also significant nasogastric reflux?
         # Large volumes of reflux often indicate a small intestinal obstruction requiring surgery.
         if Nasogastric_Reflux == '>1 liter':
-            node_truths.append(1)  # Condition: Nasogastric_Reflux == '>1 liter' is True
             return "surgical", node_truths
         else:
-            node_truths.append(0)  # Condition: Nasogastric_Reflux == '>1 liter' is False
             # Even without significant reflux, severe and intractable pain usually necessitates surgical exploration.
             return "surgical", node_truths
     else:
-        node_truths.append(0)  # Condition: Degree_of_Pain == 'severe' is False (Pain is none, mild, or moderate)
 
         # Node 2 (Right Child): If pain is not severe, are there clear signs of intestinal distension?
         # Distended small or large intestine strongly suggests an obstruction or displacement.
         if Abdomen_Appearance in ('distended small intestine', 'distended large intestine'):
-            node_truths.append(1)  # Condition: Abdomen_Appearance is 'distended small intestine' or 'distended large intestine' is True
             # Even with moderate pain, clear physical signs of obstruction usually lead to surgery.
             return "surgical", node_truths
         else:
-            node_truths.append(0)  # Condition: Abdomen_Appearance is 'distended small intestine' or 'distended large intestine' is False
             # Without severe pain or obvious intestinal distension, the case is more likely medically manageable.
             return "not surgical", node_truths
 
@@ -161,13 +156,14 @@ def dt_function_3(features):
                                      and the second element corresponds to the condition of the
                                      inner node in the "not severe pain" branch.
     """
-    nodes_truth_values = []
+    cond1_satisfied = (features['Degree of Pain'] == 'severe')
+    cond2_satisfied = (features['Abdomen Appearance'] in ('distended small intestine', 'distended large intestine'))
+
+    nodes_truth_values = [int(cond1_satisfied), int(cond2_satisfied)]
     prediction = None
 
     # Inner Node 1 (Root Node Condition): Is the degree of pain severe?
     # Rationale: Severe, intractable pain is the single most urgent indicator of a surgical colic.
-    cond1_satisfied = (features['Degree of Pain'] == 'severe')
-    nodes_truth_values.append(1 if cond1_satisfied else 0)
 
     if cond1_satisfied:
         # If pain is severe, it's highly indicative of a surgical lesion.
@@ -175,7 +171,6 @@ def dt_function_3(features):
         prediction = 'surgical'
         # The second inner node's condition is not evaluated on this path. As per example's
         # interpretation, we append 0 for the condition not reached/satisfied on this specific path.
-        nodes_truth_values.append(0)
     else:
         # If pain is not severe, we proceed to evaluate other significant physical findings.
 
@@ -183,9 +178,6 @@ def dt_function_3(features):
         # Is there significant abdominal distension (suggesting obstruction or displacement)?
         # Rationale: Even without severe pain, distended intestines on examination strongly point
         #            to an obstructive or displacement lesion usually requiring surgical intervention.
-        cond2_satisfied = (features['Abdomen Appearance'] in ('distended small intestine', 'distended large intestine'))
-        nodes_truth_values.append(1 if cond2_satisfied else 0)
-
         if cond2_satisfied:
             # If significant distension is present, it indicates a likely surgical case.
             prediction = 'surgical'
@@ -224,25 +216,23 @@ def dt_function_4(
         - A list of integers: Representing the truth values (1 for true, 0 for false)
           of the conditions encountered at each inner node along the decision path.
     """
-    node_truths = []
+    node_truths = [0, 0]
+    node_truths[0] = int(Degree_of_Pain == 'severe')
+    node_truths[1] = int(Nasogastric_Reflux == '>1 liter')
 
     # Node 1 (Root Node): Is the degree of pain severe?
     # This is a very strong indicator for surgical intervention.
     if Degree_of_Pain == 'severe':
-        node_truths.append(1)  # Condition 1 (Degree_of_Pain == 'severe') is satisfied
         # If pain is severe, it's highly indicative of a surgical case.
         return "surgical", node_truths
     else:
-        node_truths.append(0)  # Condition 1 (Degree_of_Pain == 'severe') is NOT satisfied
 
         # Node 2 (Child Node): Is there significant nasogastric reflux (>1 liter)?
         # Significant reflux often indicates a functional or physical obstruction
         # that may require surgery, even if pain is not yet severe.
         if Nasogastric_Reflux == '>1 liter':
-            node_truths.append(1)  # Condition 2 (Nasogastric_Reflux == '>1 liter') is satisfied
             return "surgical", node_truths
         else:
-            node_truths.append(0)  # Condition 2 (Nasogastric_Reflux == '>1 liter') is NOT satisfied
             # If not severe pain and no significant reflux, leans towards non-surgical management.
             return "not surgical", node_truths
 

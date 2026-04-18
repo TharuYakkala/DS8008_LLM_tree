@@ -25,28 +25,28 @@ def prep(row):
 
 def run_model_0(row):
     j, o, r = prep(row)
-    pred, _ = dt_function_0(j, o, r)
-    return TARGET_MAP[pred]
+    pred, emb = dt_function_0(j, o, r)
+    return TARGET_MAP[pred], emb
 
 def run_model_1(row):
     j, o, r = prep(row)
-    pred, _ = dt_function_1(j, o, r)
-    return TARGET_MAP[pred]
+    pred, emb = dt_function_1(j, o, r)
+    return TARGET_MAP[pred], emb
 
 def run_model_2(row):
     j, o, r = prep(row)
-    pred, _ = dt_function_2(j, o, r)
-    return TARGET_MAP[pred]
+    pred, emb = dt_function_2(j, o, r)
+    return TARGET_MAP[pred], emb
 
 def run_model_3(row):
     j, o, r = prep(row)
-    pred, _ = dt_function_3(j, o, r)
-    return TARGET_MAP[pred]
+    pred, emb = dt_function_3(j, o, r)
+    return TARGET_MAP[pred], emb
 
 def run_model_4(row):
     j, o, r = prep(row)
-    pred, _ = dt_function_4(j, o, r)
-    return TARGET_MAP[pred]
+    pred, emb = dt_function_4(j, o, r)
+    return TARGET_MAP[pred], emb
 
 
 def evaluate():
@@ -57,7 +57,7 @@ def evaluate():
     all_preds = {}
 
     for i, runner in enumerate(runners):
-        preds = [runner(row) for _, row in X.iterrows()]
+        preds = [runner(row)[0] for _, row in X.iterrows()]
         all_preds[f"Model_{i}"] = preds
 
     print("=" * 70)

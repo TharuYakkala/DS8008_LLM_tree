@@ -23,23 +23,22 @@ def dt_function_0(age, income_per_dependent, monthly_credit_card_expenses, ownin
             - list: A list of integers (0 or 1) representing the truth values of the inner nodes encountered.
                     1 if the node's condition is satisfied, 0 otherwise.
     """
-    inner_node_truth_values = []
+    inner_node_truth_values = [0, 0]
+    inner_node_truth_values[0] = int(number_of_derogatory_reports <= 0)
+    inner_node_truth_values[1] = int(income_per_dependent > 4.0)
+
 
     # Node 1: Check the number of derogatory reports (a primary indicator of credit risk)
     # Condition: number_of_derogatory_reports <= 0 (Applicant has no derogatory reports)
     if number_of_derogatory_reports <= 0:
-        inner_node_truth_values.append(1)  # Condition 1 is satisfied
 
         # Node 2 (child of Node 1 True branch): If no derogatory reports, check income per dependent
         # Condition: income_per_dependent > 4.0 (A higher income per dependent generally indicates better repayment capacity)
         if income_per_dependent > 4.0:
-            inner_node_truth_values.append(1)  # Condition 2 is satisfied
             prediction = "Accepted"
         else:
-            inner_node_truth_values.append(0)  # Condition 2 is not satisfied
             prediction = "Rejected"  # Not enough income despite clean record
     else:
-        inner_node_truth_values.append(0)  # Condition 1 is not satisfied
         prediction = "Rejected"  # Presence of derogatory reports typically leads to rejection
 
     return prediction, inner_node_truth_values
@@ -76,21 +75,18 @@ def dt_function_1(features):
     income_per_dependent = features['income per dependent (1.5 to 10)']
 
     # --- Decision Tree Logic (Max Depth 2) ---
-
+    node_truths[0] = int(number_of_derogatory_reports > 0)
+    node_truths[1] = int(income_per_dependent >= 4.0)
     # Node 1 (Root Node): Check for severe negative indicators - derogatory reports
     if number_of_derogatory_reports > 0:
-        node_truths[0] = 1  # Condition for Node 1 (derogatory reports > 0) is satisfied
         prediction = "Rejected"
     else:
-        node_truths[0] = 0  # Condition for Node 1 is not satisfied (no derogatory reports)
         
         # Node 2 (Child of Node 1's 'False' branch): Evaluate repayment capacity
         # This node is only reached if there are no derogatory reports.
         if income_per_dependent >= 4.0:  # A reasonable threshold for sufficient income per dependent
-            node_truths[1] = 1  # Condition for Node 2 (income per dependent >= 4.0) is satisfied
             prediction = "Accepted"
         else:
-            node_truths[1] = 0  # Condition for Node 2 is not satisfied (low income per dependent)
             prediction = "Rejected"
             
     return prediction, node_truths
@@ -124,34 +120,31 @@ def dt_function_2(age, income_per_dependent, monthly_credit_card_expenses, ownin
     """
     
     # Initialize truth values for the three potential inner nodes
-    node1_satisfied = 0 # Root node: number_of_derogatory_reports == 0
-    node2_satisfied = 0 # Left child of root: income_per_dependent >= 3.0
-    node3_satisfied = 0 # Right child of root: income_per_dependent >= 7.0
+    node1_satisfied = int(number_of_derogatory_reports == 0) # Root node: number_of_derogatory_reports == 0
+    node2_satisfied = int(income_per_dependent >= 3.0)# Left child of root: income_per_dependent >= 3.0
+    node3_satisfied = int(income_per_dependent >= 7.0) # Right child of root: income_per_dependent >= 7.0
     
+    final_nodes = [node1_satisfied, node2_satisfied, node3_satisfied]
     # Root Node Condition: number_of_derogatory_reports == 0
     if number_of_derogatory_reports == 0:
-        node1_satisfied = 1
         # Path: No derogatory reports
         
         # Second Level Node (Left Branch): income_per_dependent >= 3.0
         if income_per_dependent >= 3.0:
-            node2_satisfied = 1
             prediction = "Accepted"
         else:
             prediction = "Rejected" # Low income despite clean record
             
     else: # number_of_derogatory_reports > 0
-        node1_satisfied = 0 # Explicitly set for clarity, though initialized to 0
         # Path: One or more derogatory reports
         
         # Second Level Node (Right Branch): income_per_dependent >= 7.0
         if income_per_dependent >= 7.0:
-            node3_satisfied = 1
             prediction = "Accepted" # High income offsets derogatory reports
         else:
             prediction = "Rejected" # Derogatory reports and not exceptionally high income
             
-    return prediction, [node1_satisfied, node2_satisfied, node3_satisfied]
+    return prediction, final_nodes
 
 
    
@@ -176,23 +169,21 @@ def dt_function_3(age, income_per_dependent, monthly_credit_card_expenses, ownin
                node_truth_values (list): List of 1s and 0s representing truth values
                                          of inner nodes. 1 if condition satisfied, 0 otherwise.
     """
-    node_truth_values = []
+    node_truth_values = [0, 0]
+    node_truth_values[0] = int(number_of_derogatory_reports > 0)
+    node_truth_values[1] = int(income_per_dependent >= 5.0)
 
     # Node 1: Check for derogatory reports (most critical factor for credit denial)
     # Condition: number_of_derogatory_reports > 0
     if number_of_derogatory_reports > 0:
-        node_truth_values.append(1)  # Condition satisfied (derogatory reports exist)
         prediction = 'Denied'
     else:
-        node_truth_values.append(0)  # Condition not satisfied (no derogatory reports)
 
         # Node 2: If no derogatory reports, check income per dependent (key indicator of repayment capacity)
         # Condition: income_per_dependent >= 5.0
         if income_per_dependent >= 5.0:
-            node_truth_values.append(1)  # Condition satisfied (sufficient income per dependent)
             prediction = 'Accepted'
         else:
-            node_truth_values.append(0)  # Condition not satisfied (low income per dependent)
             prediction = 'Denied'
 
     return prediction, node_truth_values
@@ -202,25 +193,23 @@ def dt_function_3(age, income_per_dependent, monthly_credit_card_expenses, ownin
 # Function 4 (from dt_function4.txt)
    
 def dt_function_4(age, income_per_dependent, monthly_credit_card_expenses, owning_a_home, self_employed, number_of_derogatory_reports):
-    node_truth_values = []
+    node_truth_values = [0, 0]
+    node_truth_values[0] = int(number_of_derogatory_reports > 0)
+    node_truth_values[0] = int(income_per_dependent < 4.0)
 
     # Node 0 (Root Node - Depth 0): The most critical factor for credit approval is often past financial behavior.
     # Condition: Are there any derogatory reports, indicating past financial mismanagement?
     if number_of_derogatory_reports > 0:
-        node_truth_values.append(1)  # Condition for Node 0 is true
         prediction = "rejected"
     else:  # number_of_derogatory_reports == 0
-        node_truth_values.append(0)  # Condition for Node 0 is false
 
         # Node 1 (Depth 1, child of the 'no derogatory reports' branch):
         # If there are no derogatory reports, the next most important factor is the applicant's ability to repay.
         # Condition: Is the income per dependent below a reasonable threshold, indicating insufficient repayment capacity?
         # A threshold of 4.0 (on a scale of 1.5 to 10) is chosen as a common "sufficient" level.
         if income_per_dependent < 4.0:
-            node_truth_values.append(1)  # Condition for Node 1 is true
             prediction = "rejected"
         else:  # income_per_dependent >= 4.0
-            node_truth_values.append(0)  # Condition for Node 1 is false
             prediction = "accepted"
             
     return prediction, node_truth_values

@@ -45,8 +45,8 @@ def run_model_0(row):
     # The function expects 'severe' but data has 'continuous severe pain' / 'intermittent severe pain'
     # Map to what the function checks
     pain_simple = "severe" if "severe" in str(pain) else pain
-    pred, _ = dt_function_0(abdomen, pain_simple)
-    return SURGICAL_MAP[pred]
+    pred, emb = dt_function_0(abdomen, pain_simple)
+    return SURGICAL_MAP[pred], emb
 
 # Model 1: takes dict with 'Abdominocentesis Appearance' and 'Nasogastric Reflux'
 def run_model_1(row):
@@ -54,8 +54,8 @@ def run_model_1(row):
         'Abdominocentesis Appearance': safe_map(row["abdominocentesis_appearance"], ABDOM_APPEAR_MAP, "clear"),
         'Nasogastric Reflux': safe_map(row["nasogastric_reflux"], REFLUX_MAP, "none"),
     }
-    pred, _ = dt_function_1(features_dict)
-    return SURGICAL_MAP[pred]
+    pred, emb = dt_function_1(features_dict)
+    return SURGICAL_MAP[pred], emb
 
 # Model 2: takes all 22 features as individual args
 def run_model_2(row):
@@ -85,8 +85,8 @@ def run_model_2(row):
         row["abdomcentesis_total_protein"] if pd.notna(row["abdomcentesis_total_protein"]) else 2.0,
         safe_map(row["outcome"], OUTCOME_MAP, "lived"),
     )
-    pred, _ = dt_function_2(*args)
-    return SURGICAL_MAP[pred]
+    pred, emb = dt_function_2(*args)
+    return SURGICAL_MAP[pred], emb
 
 # Model 3: takes dict with 'Degree of Pain' and 'Abdomen Appearance'
 def run_model_3(row):
@@ -96,8 +96,8 @@ def run_model_3(row):
         'Degree of Pain': pain_simple,
         'Abdomen Appearance': safe_map(row["abdomen"], ABDOMEN_MAP, "normal"),
     }
-    pred, _ = dt_function_3(features)
-    return SURGICAL_MAP[pred]
+    pred, emb = dt_function_3(features)
+    return SURGICAL_MAP[pred], emb
 
 # Model 4: takes all 22 features as individual args
 def run_model_4(row):
@@ -127,8 +127,8 @@ def run_model_4(row):
         row["abdomcentesis_total_protein"] if pd.notna(row["abdomcentesis_total_protein"]) else 2.0,
         safe_map(row["outcome"], OUTCOME_MAP, "lived"),
     )
-    pred, _ = dt_function_4(*args)
-    return SURGICAL_MAP[pred]
+    pred, emb = dt_function_4(*args)
+    return SURGICAL_MAP[pred], emb
 
 
 def evaluate():
@@ -139,7 +139,7 @@ def evaluate():
     all_preds = {}
 
     for i, runner in enumerate(runners):
-        preds = [runner(row) for _, row in X.iterrows()]
+        preds = [runner(row)[0] for _, row in X.iterrows()]
         all_preds[f"Model_{i}"] = preds
 
     print("=" * 70)

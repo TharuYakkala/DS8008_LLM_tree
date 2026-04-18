@@ -21,8 +21,8 @@ def to_binary(pred):
 
 
 def run_model_0(row):
-    pred, _ = dt_function_0(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
-    return to_binary(pred)
+    pred, emb = dt_function_0(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
+    return to_binary(pred), emb
 
 def run_model_1(row):
     features = {
@@ -32,20 +32,20 @@ def run_model_1(row):
         'Sales/Total Assets': row["S/TA"],
         'Book Value of Equity/Book Value of Liabilities': row["BVE/BVL"],
     }
-    pred, _ = dt_function_1(features)
-    return to_binary(pred)
+    pred, emb = dt_function_1(features)
+    return to_binary(pred), emb
 
 def run_model_2(row):
-    pred, _ = dt_function_2(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
-    return to_binary(pred)
+    pred, emb = dt_function_2(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
+    return to_binary(pred), emb
 
 def run_model_3(row):
-    pred, _ = dt_function_3(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
-    return to_binary(pred)
+    pred, emb = dt_function_3(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
+    return to_binary(pred), emb
 
 def run_model_4(row):
-    pred, _ = dt_function_4(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
-    return to_binary(pred)
+    pred, emb = dt_function_4(row["WC/TA"], row["RE/TA"], row["EBIT/TA"], row["S/TA"], row["BVE/BVL"])
+    return to_binary(pred), emb
 
 
 def evaluate():
@@ -56,7 +56,7 @@ def evaluate():
     all_preds = {}
 
     for i, runner in enumerate(runners):
-        preds = [runner(row) for _, row in X.iterrows()]
+        preds = [runner(row)[0] for _, row in X.iterrows()]
         all_preds[f"Model_{i}"] = preds
 
     print("=" * 70)
