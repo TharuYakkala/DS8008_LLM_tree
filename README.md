@@ -60,9 +60,6 @@ DS8008_LLM_TREE
 
 ## Required Environment
 - python >= 3.12.13
-- There aren't many packages needed for this, as it's the point of the paper to create simplified functions that can serve as decision tree modems.
-- You only need scikit-learn, pandas, and numpy which you probably already have in your environment, and if not you can run the bellow in your terminal or notebook.
-
 ``` python
 pip install -r requirements.txt
 ```
