@@ -64,54 +64,6 @@ Part 2 Baseline Models Used: MLP, RandomForests, XGBoost, ...
 
 
 ## 📂 Folder Structure
-```
-DS8008_LLM_TREE
-├──data
-│   ├── data_sets
-│   └── Gemini_outputs
-├──src
-│   ├── Evaluators
-│   │   ├──Embeddings
-│   │   │   ├── config.py
-│   │   │   ├── emb_generator_bankruptcy.py
-│   │   │   ├── emb_generator_boxing1.py
-│   │   │   ├── emb_generator_boxing2.py
-│   │   │   ├── emb_generator_colid.py
-│   │   │   ├── emb_generator_credit.py
-│   │   │   └── embedding_eval.py
-│   │   ├──model_extractors
-│   │   │   ├── bankruptcy_models.py
-│   │   │   ├── boxing1_models.py
-│   │   │   ├── boxing2_models.py
-│   │   │   ├── colic_models.py
-│   │   │   └── credit_models.py
-│   │   ├── bankruptcy.py
-│   │   ├── boxing1.py
-│   │   ├── boxing2.py
-│   │   ├── colic.py
-│   │   ├──creditcore.py
-│   │   ├── emb_eval_looper.py
-│   │   ├── evaluate_bankruptcy.py
-│   │   ├── evaluate_boxing1.py
-│   │   ├── evaluate_boxin2.py
-│   │   ├── evaluate_colic.py
-│   │   └── evaluate_creditcore.py
-│   ├── Figures
-│   │   ├── func_example_full.png
-│   │   ├── llm_flow.png
-│   │   ├── sample_output.png
-│   │   ├── sample_output2.png
-│   │   └── sample_return_format.png
-│   ├── dt_extractor_colab.ipynb
-│   ├── gemini_prompter.py
-    └── plotter.py
-├──.gitignore
-├── LICENSE
-├── LLM_Trees_Abstract.pdf
-├──LLM_Trees_project_report.ipynb
-├── README.md
-└── requirements.txt
-```
 
 ## Required Environment
 - python >= 3.12.13
@@ -159,8 +111,6 @@ You can find the prompt in `src/pompter.py` as a reference if you are creating y
 
 ### Evaluate LLM Trees
 This is done using the [project report notebook](LLM_Trees_project_report.ipynb) which you can easily follow along to test the functions that we extracted under the section: Induction Evaluation. 
-
-**[NOTE]** To test your own functions that you extract, you will need to edit them yourself, and create an evaluation function for them. You can refer to the scripts in `src/Evaluators` for examples.  
 
 
 ## Part 2: Embedding Induction  
