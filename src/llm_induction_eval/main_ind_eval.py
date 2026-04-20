@@ -1,20 +1,24 @@
 import re
+import os
+import tempfile
 import numpy as np
+from pathlib import Path
 import pandas as pd
-from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score
-from sklearn.neural_network import MLPClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.impute import KNNImputer
-from xgboost import XGBClassifier
-import warnings
-from sklearn.exceptions import ConvergenceWarning
+from autogluon.tabular import TabularPredictor
+from tabpfn import TabPFNClassifier
 
-warnings.filterwarnings("ignore", category=ConvergenceWarning)
-MLP_HIDDEN_STATES = [(10,), (25,), (50,), (75,), (100,)]
-MLP_ALPHAS = [0.0001, 0.001, 0.01, 0.1]
-
+_env_path = Path(__file__).parent.parent.parent / '.env'
+if _env_path.exists():
+    with open(_env_path) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line.startswith('TABPFN_TOKEN'):
+                _token = _line.split('=', 1)[1].strip().strip('"').strip("'")
+                os.environ['TABPFN_TOKEN'] = _token
+                break
 MODEL_FOLDERS = {
     'gpt-oss': 'gpt_oss',
     'gemma3': 'gemma3',
@@ -41,30 +45,6 @@ def load_tree_function(filepath):
     local_ns = {}
     exec(code, local_ns)
     return local_ns[func_name]
-
-
-def train_mlp(X_train, y_train, X_test, y_test, random_state):
-    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=random_state)
-
-    mlp = MLPClassifier(random_state=random_state, max_iter=1000)
-
-    param_grid = {
-        "hidden_layer_sizes": MLP_HIDDEN_STATES,
-        "alpha": MLP_ALPHAS
-    }
-
-    grid = GridSearchCV(
-        estimator=mlp,
-        param_grid=param_grid,
-        scoring='f1_macro',
-        cv=cv,
-        n_jobs=-1
-    )
-
-    grid.fit(X_train, y_train)
-    y_pred = grid.best_estimator_.predict(X_test)
-    score = f1_score(y_test, y_pred, average="macro")
-    return score
 
 
 def evaluate_ind_dataset(dataset: str):
@@ -98,41 +78,21 @@ def evaluate_ind_dataset(dataset: str):
                 'f1-score': score
             })
 
-        # Decision Tree
-        dt = DecisionTreeClassifier(max_depth=2, random_state=i_split)
-        dt.fit(X_train, y_train)
-        score = f1_score(y_test.values, dt.predict(X_test), average='macro')
-        results.append({'model': 'dt', 'f1-score': score})
+        # AutoGluon
+        train_df = X_train.copy().reset_index(drop=True)
+        train_df['label'] = y_train.reset_index(drop=True).values
+        with tempfile.TemporaryDirectory() as tmpdir:
+            predictor = TabularPredictor(label='label', path=tmpdir, verbosity=0).fit(
+                train_df, time_limit=30
+            )
+            ag_preds = predictor.predict(X_test.reset_index(drop=True)).values
+        score = f1_score(y_test.values, ag_preds, average='macro')
+        results.append({'model': 'autogluon', 'f1-score': score})
 
-        # Random Forest
-        rf = RandomForestClassifier(n_estimators=5, max_depth=2, random_state=42)
-        rf.fit(X_train, y_train)
-        score = f1_score(y_test.values, rf.predict(X_test), average='macro')
-        results.append({'model': 'rf', 'f1-score': score})
+        # TabPFN
+        tabpfn = TabPFNClassifier()
+        tabpfn.fit(X_train, y_train)
+        score = f1_score(y_test.values, tabpfn.predict(X_test), average='macro')
+        results.append({'model': 'tabpfn', 'f1-score': score})
 
-        # Extra Trees
-        et = ExtraTreesClassifier(n_estimators=5, max_depth=2, random_state=42)
-        et.fit(X_train, y_train)
-        score = f1_score(y_test.values, et.predict(X_test), average='macro')
-        results.append({'model': 'et', 'f1-score': score})
-
-        # XGBoost
-        xgb = XGBClassifier(n_estimators=5, max_depth=2, random_state=42, eval_metric='logloss', verbosity=0)
-        xgb.fit(X_train, y_train)
-        score = f1_score(y_test.values, xgb.predict(X_test), average='macro')
-        results.append({'model': 'xgb', 'f1-score': score})
-
-        # baseline
-        score = train_mlp(
-            X_train,
-            y_train,
-            X_test,
-            y_test,
-            random_state=i_split
-        )
-
-        results.append({
-            'model': 'baseline',
-            'f1-score': score
-        })
     return pd.DataFrame(results)
