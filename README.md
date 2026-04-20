@@ -23,33 +23,12 @@ The original paper implements the following:
   
 <br> 
 
-The first half of this readme covers the original research paper while the latter half covers our implementation.
-
-## The Research Paper: Motivation, Methdology, Evaluation
-In this section, we briefly discuss the <u> original research paper </u> by Knauer et al. (2025) and explain key insights and motivations.  
-
-**Motivation**  
-The *motivation* behind the paper comes from **knowledge distillation** of LLMs (their "world knowledge") and the idea that data can be scarce or propriety. This paper also draws from **in-context learning** and **transfer learning**. The key idea is to find a way to use the "world knowledge" that large language models have, which have been trained on an enormous amount of data from the internet, and derive *models* (in this case, decision trees), **without any training data** ever passed to the LLM. This overcomes the issue of privacy concerns with proprietary data and demonstrates how LLMs can still be leveraged for small datasets that would otherwise be difficult to train in models.
+**Motivation**
+The *motivation* behind the paper comes from **knowledge distillation** of LLMs (their "world knowledge") and the idea that data can be scarce or propriety. This paper also draws from **in-context learning** and **transfer learning**. The key idea is to find a way to use the "world knowledge" that large language models have, which have been trained on an enormous amount of data from the internet, and derive *models* (in this case, decision trees), **without any training data** ever passed to the LLM. This overcomes the issue of privacy concerns with proprietary data and demonstrates how LLMs can still be leveraged for small datasets that would otherwise be difficult to train in models.  
 
 > Exercept from the paper: "we present the first approach to apply state-of-the-art LLMs for zero-shot model generation using in-context learning, i.e., we show how LLMs can build intrinsically interpretable trees without access to pretrained model weights and without any training data" (Knauer et al., 2025)  
 
 <u>Domains of study:</u> large language models, zero-shot prompting, in-context learning, knowledge distillation, transfer learning, data scarcity, intrinsic model induction   
-
-<br>  
-
-**Methdology**  
-*Part 1: Zero-shot Decision Tree Induction*  
-Authors ask an LLM to generate a decision tree using only the feature names (column headers); no actual data values, no examples (zero-shot prompting). Then the LLM is used again to convert text-based decision tree into a Python function to be able to make predictions on data.  
-→ LLM Models Used: Claude 3.5 Sonnet, Gemini 1.5 Pro, GPT-4o, GPT-o1  
-→ Baseline Models Used: BSS, OCTs, AutoGluon, Auto-Prognosis, TabPFN
-
-*Part 2: Embedding Induction*  
-The generated decision tree's structure is used to create an embedding of each data point. For a given sample, every internal decision node in the tree is a binary (0 or 1) value. The authors generate 5 diverse trees per LLM (temperature used to control variety) and concatenate all the node truth values into a single vector that is fed into a smal NN with the original features for classification.   
-→ LLM Models Used: Claude 3.5 Sonnet, Gemini 1.5 Pro, GPT-4o, GPT-o1  
-→ Baseline Models Used: MLP with no embedding, Random trees embeddings, Extra trees embeddings, Random forests embeddings, XGboost embeddings 
-
-**Evaluation**  
-Metrics used: macro F1-score, balanced accuracy
 
 <br> 
 
