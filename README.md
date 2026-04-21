@@ -52,18 +52,22 @@ LLM Models Used (Ollama):
 Part 1 Baseline Models Used: Autogluon, TabPFN  
 
   
-Part 2 Baseline Models Used: MLP, RandomForests, XGBoost, ...  
+Part 2 Baseline Models Used: 
+* LLM Embeddings
+* Baseline - Uses the raw input values
+* RandomTreeEmbeddings
+* RandomTrees - Supervised
+* RandomTrees - SemiSupervised
+* ExtraTrees - Supervised
+* ExtraTrees - Semisupervised
+* XGBoost - Supervised
+* XGBoost - Semisupervised  
 
 
 <br>  
 
 **Note:** You can find a table of implementation comparison in *LLM_trees_project_report.ipynb* to see how our implementation differs/matches the original paper  
   
-
-### To begin, first look at the folder structure below. 
-
-
-## 📂 Folder Structure
 
 ## Required Environment
 - python >= 3.12.13
@@ -82,26 +86,7 @@ ollama pull mistral-small3.2:24b
 <br>  
 
 ## Required Dependencies  
-*This is for running individual models by yourself*  
-
-To run the Autogluon model, you may need to run the following in *anaconda prompt*:
-```
-conda create -n myenv python=3.11 -y
-conda activate myenv
-pip install -U pip
-pip install -U setuptools wheel
-pip install autogluon --extra-index-url https://download.pytorch.org/whl/cpu
-```  
-(refer to official docs [here](https://auto.gluon.ai/stable/install.html))
-
-To run the TabPFN model, you may need to run the following:
-```bash
-pip install tabpfn
-```
-You also may be prompted for an API key when running TabPFN, follow the instructions at the CLI when prompted to do so. 
-
-**[NOTE]:** These models may require different versions of scikit or python. Please refer to their official documentations for further details.
-
+**Please refer to the `requirements.txt` file** for required dependencies as some models require API access. 
 
 ## Part 1: Decision Tree Induction  
 **Follow along the project report notebook for the entire pipeline. Make sure to run each cell from the start.**  
@@ -120,12 +105,6 @@ Refer to *Step 2* in `src/prompter.py` for help with prompting for embeddings (i
 ### Evaluate LLM Embeddings  
 Again you may follow the [project report notebook](LLM_Trees_project_report.ipynb) under the section: Embedding Evaluation. 
 
-## Results and Discussion  
-*Part 1: DT Induction Results*
-Among all 5 datasets, Autogluon consistently had the highest f1-score. However, for the bankruptcy dataset, almost all the decision trees classifiers from llms were in close competition with the data-driven models, each achieving greater than 0.5. The overall mean for the llm decision trees classifications were within a bound of 0.2 with TabPFN. 
-
-*Part 2: Embedding Induction Results*
-mention mistral...
 
 ## SUMMARY
 Replication of Oh LLM, I’m Asking Thee, Please Give Me a Decision Tree”: Zero-Shot Decision Tree Induction and Embedding with Large Language Models (KDD conference) paper for DS8008 Class.
