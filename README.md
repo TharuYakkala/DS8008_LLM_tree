@@ -8,6 +8,7 @@ This repository is on the *replication* of the research paper:
 > #### "Oh LLM, I'm Asking Thee, Please Give Me a Decision Tree": Zero-Shot Decision Tree Induction and Embedding with Large Language Models (Knauer et al., 2025)
 
 The original research paper can be found here: [link to original paper](https://dl.acm.org/doi/10.1145/3711896.3736818)  
+Alternative link to research paper: [alt link](https://arxiv.org/abs/2409.18594)  
 
 Original paper repository: [link to original repo](https://github.com/ml-lab-htw/llm-trees)  
 
