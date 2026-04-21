@@ -9,6 +9,9 @@ from sklearn.metrics import f1_score
 from sklearn.impute import KNNImputer
 from autogluon.tabular import TabularPredictor
 from tabpfn import TabPFNClassifier
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
 
 _env_path = Path(__file__).parent.parent.parent / '.env'
 if _env_path.exists():
